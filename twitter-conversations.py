@@ -219,7 +219,8 @@ def findData(teams):
     teamcount = -1
     for f in teams:
         teamcount = teamcount + 1
-        if (teamcount >8 and teamcount < 12):
+        
+        if (teamcount > 13 and teamcount < 15):
             for t in teams:
                 if t != f:
                     temp = getTweets(f,t)
@@ -236,7 +237,7 @@ result = findData(nba)
 print("done")
 df = pd.DataFrame(result)
 print(df)
-df.to_csv("nba-conversations9-11.csv", sep=',')
+df.to_csv("nba-conversations14.csv", sep=',')
 
 driver.close()
 
