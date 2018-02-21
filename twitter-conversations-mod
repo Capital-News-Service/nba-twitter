@@ -25,7 +25,8 @@ chrome_options.add_argument("--headless")
 chrome_options.binary_location = 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'
 
 #Fill in path to chromedrive.exe here
-driver = webdriver.Chrome(executable_path="C:\\cygwin\\home\\jagluck\\cns\\headless\\chromedriver.exe", chrome_options=chrome_options)
+chromedriver = '/usr/bin/chromedriver/chromedriver'
+driver = webdriver.Chrome(chromedriver)
 
 #This is ther list of accounts you would like to gather, put in their twitter usernames
 nba = ['cavs','okcthunder','celtics','NYKnicks','BrooklynNets','PelicansNBA', 'Pacers', 'OrlandoMagic','Timberwolves','MiamiHEAT',
@@ -47,6 +48,8 @@ def scroll_down():
         lastHeight = newHeight
     
         driver.maximize_window()
+
+        time.sleep(.5)
 
 def load_page(url):
     driver.get(url) 
@@ -91,7 +94,7 @@ def getTweets(sender, to):
             
             textcontent = i.find("p", {"class": "tweet-text"})
             
-            print("Tweet: " + textcontent.get_text())
+            #print("Tweet: " + textcontent.get_text())
             
             #make sure it is a reply
             isthisareply = i.find_all("div", {"class": "ReplyingToContextBelowAuthor"})
@@ -109,21 +112,20 @@ def getTweets(sender, to):
                     
                     finished = False
                     while(not finished):
-                        #print("nba")
+
+                        print(" * Give it a shot * ")
+                        print("Tweet: " + textcontent.get_text())
+
                         #refresh page
                         load_page("https://twitter.com/search?q=from%3A" + sender + "%20%40" + to + "&src=typd") 
                        
                         id = i.get('id')
                         if (check_exists_by_id(id)):
+                           
                             #click on element
                             ele = driver.find_element_by_id(id)
-                            time.sleep(.5)
-                            ele.click()
-                            time.sleep(.5)
                             
-                            #load html with overlay
-                            soup = BeautifulSoup(driver.page_source)
-                            overlay = soup.find("div", {"class": "permalink-container"})
+                            overlay = None
                             
                             if (check_exists_by_id(id)):
                                 #load overlay
@@ -136,17 +138,21 @@ def getTweets(sender, to):
                                 #if overlay not found click around tweet untill it comes up
                                 #this is mostly for pictures and gifs where you need to hit the outside
                                 while (not overlay):
-                                    #print("---+-----")
-                            
-                                    xloc = randint(0, eleheight)
-                                    yloc = randint(0, elewidth)
+                                    print("---+-----")
+
+                                    load_page("https://twitter.com/search?q=from%3A" + sender + "%20%40" + to + "&src=typd") 
+
+                                    xloc = randint(int(elewidth/2), elewidth)
+                                    yloc = randint(int(eleheight/2), eleheight)
+
                                     if (check_exists_by_id(id)):
                                         ele = driver.find_element_by_id(id)
                                         action = webdriver.common.action_chains.ActionChains(driver)
-                                        action.move_to_element_with_offset(ele, xloc, yloc)
+                                        action.move_to_element_with_offset(ele, 1, 1)
+                                        #action.move_to_element(ele)
                                         action.click()
                                         action.perform()
-                                        #print("in here")
+                                        print("in here")
                                         time.sleep(.5)
                                         soup = BeautifulSoup(driver.page_source)
                                         overlay = soup.find("div", {"class": "permalink-container"})
@@ -155,10 +161,10 @@ def getTweets(sender, to):
                                         print("----- not found 0 ------")
                                         break
                                 
-                                #print("XXXXXXXX")
+                                print("XXXXXXXX")
                                 if (isfound):
                                     
-                                    #print("overlay")
+                                    print("overlay")
                                     
                                     scroll_down()
                                     
@@ -170,9 +176,11 @@ def getTweets(sender, to):
                                     names = []
                                     
                                     #Get ancestor In overlay
-                                    topstream = overlay.find_all("div", {"class": "permalink-ancestor-tweet"})
+                                    topstream = overlay.find_all("div", {"class": "permalink-in-reply-tos"})
+                                    #topstream = overlay.find_all("div", {"class": "permalink-ancestor-tweet"})
                                     
-                
+                                    #print(overlay)
+                                    print(len(topstream))
                                     if (len(topstream) > 0):
                                         #print("in tweets")
                                         
@@ -263,17 +271,16 @@ def findData(teams):
     return table
 
    
-# result = findData(nbaSmall)
-# print("done")
-# df = pd.DataFrame(result, columns=['index', 'head', 'from', 'to', 'size', 'dates', 'tweets', 'size2'])
-# df.sort('size')
-# df.drop_duplicates(subset=['head'], take_last=True)
-# print(df)
-# df.to_csv("nba-conv-test.csv", sep=',')
-df = pd.read_csv("C:\\Users\\jagluck\\Documents\\Github\\nba-twitter\\hold.csv", encoding = "ISO-8859-1")
-#df = pd.DataFrame(result, columns=['index', 'head', 'from', 'to', 'size', 'dates', 'tweets', 'size2'])
+result = findData(nbaSmall)
+print("done")
+df = pd.DataFrame(result, columns=['index', 'head', 'from', 'to', 'size', 'dates', 'tweets', 'size2'])
+df.sort('size')
+df.drop_duplicates(subset=['head'], take_last=True)
 print(df)
-df = df.drop_duplicates(["head"])
+df = df.sort_values('size', ascending=False).drop_duplicates('head')
+df.to_csv("nba-conv-test.csv", sep=',')
+df = pd.DataFrame(result, columns=['index', 'head', 'from', 'to', 'size', 'dates', 'tweets', 'size2'])
 print(df)
 driver.close()
+
 

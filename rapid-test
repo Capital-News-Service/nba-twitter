@@ -1,0 +1,245 @@
+# Jake Gluck - Capital News Service
+
+import sys
+
+#pip.main(['install','selenium'])
+#pip.main(['install','bs4'])
+#pip.main(['install','lxml'])
+
+import time
+import pandas as pd
+from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
+from selenium.common.exceptions import NoSuchElementException  
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.options import Options
+from bs4 import BeautifulSoup
+from random import *
+
+#Set up headless browser
+chrome_options = Options()
+chrome_options.add_argument("--headless")
+chrome_options.binary_location = 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'
+
+#Fill in path to chromedrive.exe here
+chromedriver = '/usr/bin/chromedriver/chromedriver'
+driver = webdriver.Chrome(chromedriver)
+
+#This is ther list of accounts you would like to gather, put in their twitter usernames
+nba = ['cavs','okcthunder','celtics','NYKnicks','BrooklynNets','PelicansNBA', 'Pacers', 'OrlandoMagic','Timberwolves','MiamiHEAT',
+'Hornets', 'DetroitPistons', 'DallasMavs', 'LAClippers', 'Lakers', 'UtahJazz', 'nuggets', 'WashWizards', 'ChicagoBulls',
+'spurs', 'Suns', 'HoustonRockets', 'Warriors', 'ATLHawks', 'MemGrizz', 'Bucks', 'Raptors', 'SacramentoKings', 'Sixers', 'trailblazers'];
+
+nbaSmall=['cavs','okcthunder','celtics','NYKnicks','BrooklynNets']
+
+def scroll_down():
+    #scroll to bottom of page
+    lastHeight = driver.execute_script("return document.body.scrollHeight")
+        
+    while True:
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(.5)
+        newHeight = driver.execute_script("return document.body.scrollHeight")
+        if newHeight == lastHeight:
+         	break
+        lastHeight = newHeight
+    
+        driver.maximize_window()
+
+        time.sleep(.5)
+
+def load_page(url):
+    driver.get(url) 
+    time.sleep(1)
+        
+    scroll_down()
+        
+
+def check_exists_by_id(id):
+    try:
+        driver.find_element_by_id(id)
+    except NoSuchElementException:
+        return False
+    return True
+
+#get all conversations from on sender to one reciever
+def getTweets(sender, to):
+    
+    #print("---- START -------")
+    #load page
+    load_page("https://twitter.com/search?q=from%3A" + sender + "%20%40" + to + "&src=typd") 
+    
+    #load html
+    soup = BeautifulSoup(driver.page_source, "lxml")
+    stream = soup.find("ol", {"class": "stream-items"})
+    
+    row = []
+       
+    #if no tweets between return empty
+    if (stream is None):
+        print("fail")
+    else:
+        
+        items = stream.find_all("li", {"class": "stream-item"})
+        
+        
+        headtweets = {}
+        convs = {}
+        
+        
+        #loop through every tweet in mentions
+        count = 1
+        for i in items:
+            #print(count)
+            count = count + 1
+            textcontent = i.find("p", {"class": "tweet-text"})
+            
+            #print("Tweet: " + textcontent.get_text())
+            
+            #make sure it is a reply
+            isthisareply = i.find_all("div", {"class": "ReplyingToContextBelowAuthor"})
+            if (len(isthisareply) > 0):
+                
+
+                #if tweet is replying to an nba team
+                replyusers = isthisareply[0].findAll("span", {"class": "username"})
+
+                #data-mentions="EnlightenOne97 kaininho cavs barclayscenter NBA"
+
+              #  replyusers = isthisareply[0].findAll("div", {"class": "tweet"})[0]['data-mentions'].split()
+                test = i.find("div", {"class": "tweet"})['data-mentions']
+                print(replyusers)
+                print("----")
+                print(test)
+                isNba = False
+                for username in replyusers:
+                    if username.get_text()[1:] in nba:
+                        isNba = True
+                
+                if isNba:
+                    tweet_div = i.find_all("div", {"class": "tweet"})
+                    data_permalink_path = str(tweet_div[0]['data-permalink-path'])
+
+                    convo_url = "https://twitter.com" + data_permalink_path
+
+                    finished = False
+
+                    while(not finished):
+                        load_page(convo_url)
+
+                        soup = BeautifulSoup(driver.page_source, "lxml")
+                        overlay = soup.find("div", {"class": "permalink-container"})
+
+                        if(overlay):
+                                                         
+                            conv = []
+                            
+                            tweets = []
+                            times = []
+                            names = []
+                            
+                            #Get ancestor In overlay
+                            topstream = overlay.find_all("div", {"class": "permalink-in-reply-tos"})
+                            #topstream = overlay.find_all("div", {"class": "permalink-ancestor-tweet"})
+                            
+                            if (len(topstream) > 0):
+                                #print("in tweets")
+                                
+                                headtweet = topstream[0].find("p", {"class": "tweet-text"}).get_text()
+                                
+                                #print("added")
+                                conv.append(headtweet)
+                                conv.append(sender)
+                                conv.append(to) 
+                                
+                                #get all tweets in ancestor
+                                for i2 in topstream:
+                                    textcontent = i2.find("p", {"class": "tweet-text"})
+                                    timecontent = i2.find('span', {"class":"_timestamp"})
+                                    tweets.append(textcontent.get_text())
+                                    date = timecontent.get_text()
+                                    if (date[-4:-2] == '20'):
+                                        times.append(date)
+                                    else:
+                                        times.append(date + " 2017")
+                                    namecontent = i2.find("strong", {"class": "fullname"})
+                                    names.append(namecontent.get_text())
+                                        
+                                #GET REPLIES
+                                topstream = overlay.find_all("div", {"class": "permalink-tweet"})
+                                
+                                #get all tweets in replies
+                                for i2 in topstream:
+                                    textcontent = i2.find("p", {"class": "tweet-text"})
+                                    timecontent = i2.find('span', {"class":"_timestamp"})
+                                    tweets.append(textcontent.get_text())
+                                    date = timecontent.get_text()
+                                    if (date[-4:-2] == '20'):
+                                        times.append(date)
+                                    else:
+                                        times.append(date + " 2017")
+                                    namecontent = i2.find("strong", {"class": "fullname"})
+                                    names.append(namecontent.get_text())
+                                    
+                                
+                                if (headtweet not in headtweets or headtweets[headtweet] < len(tweets)):    
+                                    conv.append(tweets)
+                                    conv.append(len(tweets))
+                                    conv.append(times)
+                                    conv.append(names)
+                                    conv.append(len(names))
+                                    convs[headtweet] = conv
+                                    headtweets[headtweet] = len(tweets)
+                                    finished = True
+                                else:
+                                    print("We saw this already")
+                                    finished = True
+
+                            else:
+                                print("--- this is a problem-----")           
+                        else:
+                            print("----- no overlay ------") 
+                        
+                else:
+                    1 + 1
+                    #print("----- not a nba team ------")
+            else:
+                1 + 1
+                #print("----- not a reply ------")
+                
+        for key, value in convs.items():
+            row.append(value)
+     
+    return row
+
+def findData(teams):
+    table = []
+    c = 0
+    teamcount = -1
+    for f in teams:
+        #teamcount = teamcount + 1
+       # if (teamcount >13 and teamcount < 15):
+        for t in teams:
+            if t != f:
+                temp = getTweets(f,t)
+                if (temp):
+                    table = table + temp
+                    print("relation finished " + str(c) + " size is " + str(len(table)))
+                else:
+                    print("relation finished " + str(c) + " size is " + str(len(table)))
+                c = c + 1
+    return table
+
+   
+result = findData(nbaSmall)
+print("done")
+df = pd.DataFrame(result, columns=['head', 'from', 'to', 'tweets', 'size', 'dates', 'tweets', 'size2'])
+df = df.sort_values('size', ascending=False).drop_duplicates('head')
+print(df)
+df.to_csv("nba-conv-test.csv", sep=',')
+driver.close()
+
+
