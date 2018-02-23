@@ -34,7 +34,7 @@ nba = ['cavs','okcthunder','celtics','NYKnicks','BrooklynNets','PelicansNBA', 'P
 'Hornets', 'DetroitPistons', 'DallasMavs', 'LAClippers', 'Lakers', 'UtahJazz', 'nuggets', 'WashWizards', 'ChicagoBulls',
 'spurs', 'Suns', 'HoustonRockets', 'Warriors', 'ATLHawks', 'MemGrizz', 'Bucks', 'Raptors', 'SacramentoKings', 'Sixers', 'trailblazers'];
 
-nbaSmall=['Suns','spurs']
+nbaSmall=['DallasMavs', 'LAClippers', 'Lakers', 'UtahJazz']
 
 def scroll_down():
     #scroll to bottom of page
@@ -226,8 +226,10 @@ def getTweets(sender, to):
                                         print("We saw this already")
                                         finished = True
                                 else:
+                                    print("Tweet: " + textcontent.get_text())
                                     print("this is a problem")             
                             else:
+                                print("Tweet: " + textcontent.get_text())
                                 print("--- this is a problem-----")           
                         else:
                             print("----- no overlay ------") 
