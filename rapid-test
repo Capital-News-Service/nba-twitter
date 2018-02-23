@@ -18,6 +18,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 from random import *
+import json
 
 #Set up headless browser
 chrome_options = Options()
@@ -33,7 +34,7 @@ nba = ['cavs','okcthunder','celtics','NYKnicks','BrooklynNets','PelicansNBA', 'P
 'Hornets', 'DetroitPistons', 'DallasMavs', 'LAClippers', 'Lakers', 'UtahJazz', 'nuggets', 'WashWizards', 'ChicagoBulls',
 'spurs', 'Suns', 'HoustonRockets', 'Warriors', 'ATLHawks', 'MemGrizz', 'Bucks', 'Raptors', 'SacramentoKings', 'Sixers', 'trailblazers'];
 
-nbaSmall=['cavs','okcthunder','celtics','NYKnicks','BrooklynNets']
+nbaSmall=['Suns','spurs']
 
 def scroll_down():
     #scroll to bottom of page
@@ -105,20 +106,20 @@ def getTweets(sender, to):
                 
 
                 #if tweet is replying to an nba team
-                replyusers = isthisareply[0].findAll("span", {"class": "username"})
+                test = json.loads(i.find("div", {"class": "tweet"})['data-reply-to-users-json'])
 
-                #data-mentions="EnlightenOne97 kaininho cavs barclayscenter NBA"
+                replyusers = []
 
-              #  replyusers = isthisareply[0].findAll("div", {"class": "tweet"})[0]['data-mentions'].split()
-                test = i.find("div", {"class": "tweet"})['data-mentions']
-                print(replyusers)
-                print("----")
-                print(test)
+                for b in test:
+                    replyusers.append(b['screen_name'])
+
+                valid = set(nba) - set([sender])
+
                 isNba = False
                 for username in replyusers:
-                    if username.get_text()[1:] in nba:
+                    if username in valid:
                         isNba = True
-                
+
                 if isNba:
                     tweet_div = i.find_all("div", {"class": "tweet"})
                     data_permalink_path = str(tweet_div[0]['data-permalink-path'])
@@ -140,64 +141,92 @@ def getTweets(sender, to):
                             tweets = []
                             times = []
                             names = []
+                            user_names = []
                             
                             #Get ancestor In overlay
-                            topstream = overlay.find_all("div", {"class": "permalink-in-reply-tos"})
-                            #topstream = overlay.find_all("div", {"class": "permalink-ancestor-tweet"})
-                            
-                            if (len(topstream) > 0):
-                                #print("in tweets")
-                                
-                                headtweet = topstream[0].find("p", {"class": "tweet-text"}).get_text()
-                                
-                                #print("added")
-                                conv.append(headtweet)
-                                conv.append(sender)
-                                conv.append(to) 
-                                
-                                #get all tweets in ancestor
-                                for i2 in topstream:
-                                    textcontent = i2.find("p", {"class": "tweet-text"})
-                                    timecontent = i2.find('span', {"class":"_timestamp"})
-                                    tweets.append(textcontent.get_text())
-                                    date = timecontent.get_text()
-                                    if (date[-4:-2] == '20'):
-                                        times.append(date)
-                                    else:
-                                        times.append(date + " 2017")
-                                    namecontent = i2.find("strong", {"class": "fullname"})
-                                    names.append(namecontent.get_text())
-                                        
-                                #GET REPLIES
-                                topstream = overlay.find_all("div", {"class": "permalink-tweet"})
-                                
-                                #get all tweets in replies
-                                for i2 in topstream:
-                                    textcontent = i2.find("p", {"class": "tweet-text"})
-                                    timecontent = i2.find('span', {"class":"_timestamp"})
-                                    tweets.append(textcontent.get_text())
-                                    date = timecontent.get_text()
-                                    if (date[-4:-2] == '20'):
-                                        times.append(date)
-                                    else:
-                                        times.append(date + " 2017")
-                                    namecontent = i2.find("strong", {"class": "fullname"})
-                                    names.append(namecontent.get_text())
-                                    
-                                
-                                if (headtweet not in headtweets or headtweets[headtweet] < len(tweets)):    
-                                    conv.append(tweets)
-                                    conv.append(len(tweets))
-                                    conv.append(times)
-                                    conv.append(names)
-                                    conv.append(len(names))
-                                    convs[headtweet] = conv
-                                    headtweets[headtweet] = len(tweets)
-                                    finished = True
-                                else:
-                                    print("We saw this already")
-                                    finished = True
+                            ancestors = overlay.find_all("div", {"class": "permalink-in-reply-tos"})
 
+                            if (len(ancestors) > 0):
+                                topstream = ancestors[0].find_all("div", {"class": "tweet"})
+                                
+                                if (len(topstream) > 0):
+                                    #print("in tweets")
+                                    
+                                    headtweet = topstream[0].find("p", {"class": "tweet-text"}).get_text()
+                                    
+                                    #print("added")
+                                    conv.append(headtweet)
+                                    conv.append(sender)
+                                    conv.append(to) 
+                                    
+                                    #get all tweets in ancestor
+                                    for i2 in topstream:
+                                        textcontent = i2.find("p", {"class": "tweet-text"})
+                                        timecontent = i2.find('span', {"class":"_timestamp"})
+                                        tweets.append(textcontent.get_text())
+                                        date = timecontent.get_text()
+                                        if (date[-4:-2] == '20'):
+                                            times.append(date)
+                                        else:
+                                            times.append(date + " 2017")
+                                        namecontent = i2.find("strong", {"class": "fullname"})
+                                        names.append(namecontent.get_text())
+                                        usernamecontent = i2.find("span", {"class": "username"})
+                                        user_names.append(usernamecontent.get_text())
+                                            
+                                    #GET REPLIES
+                                    topstream = overlay.find_all("div", {"class": "permalink-tweet"})
+                                    
+                                    #get all tweets in replies
+                                    for i2 in topstream:
+                                        textcontent = i2.find("p", {"class": "tweet-text"})
+                                        timecontent = i2.find('span', {"class":"_timestamp"})
+                                        tweets.append(textcontent.get_text())
+                                        date = timecontent.get_text()
+                                        if (date[-4:-2] == '20'):
+                                            times.append(date)
+                                        else:
+                                            times.append(date + " 2017")
+                                        namecontent = i2.find("strong", {"class": "fullname"})
+                                        names.append(namecontent.get_text())
+                                        usernamecontent = i2.find("span", {"class": "username"})
+                                        user_names.append(usernamecontent.get_text())
+                                        
+                                    
+                                    if ((headtweet not in headtweets) or (headtweets[headtweet] < len(tweets))): 
+
+
+
+                                        #Count how many unique nba teams are in convo 
+                                        cc = 0 
+                                        seen = []
+                                        for n in user_names:
+                                            name = n[1:]
+                                            if name in nba:
+                                                if name not in seen:
+                                                    seen.append(name)
+                                                    cc = cc + 1
+
+
+
+                                        if (cc > 1):
+                                            conv.append(tweets)
+                                            conv.append(len(tweets))
+                                            conv.append(times)
+                                            conv.append(names)
+                                            conv.append(len(names))
+                                            conv.append(user_names)
+                                            convs[headtweet] = conv
+                                            headtweets[headtweet] = len(tweets)
+                                            finished = True
+                                        else:
+                                            #print("Not a convo")
+                                            finished = True
+                                    else:
+                                        print("We saw this already")
+                                        finished = True
+                                else:
+                                    print("this is a problem")             
                             else:
                                 print("--- this is a problem-----")           
                         else:
@@ -236,7 +265,7 @@ def findData(teams):
    
 result = findData(nbaSmall)
 print("done")
-df = pd.DataFrame(result, columns=['head', 'from', 'to', 'tweets', 'size', 'dates', 'tweets', 'size2'])
+df = pd.DataFrame(result, columns=['head', 'from', 'to', 'tweets', 'size', 'dates', 'names', 'size2', 'usernames'])
 df = df.sort_values('size', ascending=False).drop_duplicates('head')
 print(df)
 df.to_csv("nba-conv-test.csv", sep=',')
