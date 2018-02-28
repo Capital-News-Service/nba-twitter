@@ -31,21 +31,61 @@ driver = webdriver.Chrome(chromedriver)
 
 #This is ther list of accounts you would like to gather, put in their twitter usernames
 nba = ['cavs','okcthunder','celtics','NYKnicks','BrooklynNets','PelicansNBA', 'Pacers', 'OrlandoMagic','Timberwolves','MiamiHEAT',
-'Hornets', 'DetroitPistons', 'DallasMavs', 'LAClippers', 'Lakers', 'UtahJazz', 'nuggets', 'WashWizards', 'ChicagoBulls',
-'spurs', 'Suns', 'HoustonRockets', 'Warriors', 'ATLHawks', 'MemGrizz', 'Bucks', 'Raptors', 'SacramentoKings', 'Sixers', 'trailblazers'];
+'Hornets', 'DetroitPistons', 'DallasMavs', 'LAClippers', 'Lakers', 'UtahJazz', 'nuggets', 'WashWizards', 'chicagobulls',
+'spurs', 'Suns', 'HoustonRockets', 'warriors', 'ATLHawks', 'MemGrizz', 'Bucks', 'Raptors', 'SacramentoKings', 'Sixers', 'trailblazers'];
 
-nbaSmall=['DallasMavs', 'LAClippers', 'Lakers', 'UtahJazz']
+NBACAPS = ['CAVS','OKCTHUNDER','CELTICS','NYKNICKS','BROOKLYNNETS','PELICANSNBA', 'PACERS', 'ORLANDOMAGIC','TIMBERWOLVES','MIAMIHEAT',
+'HORNETS', 'DETROITPISTONS', 'DALLASMAVS', 'LACLIPPERS', 'LAKERS', 'UTAHJAZZ', 'NUGGETS', 'WASHWIZARDS', 'CHICAGOBULLS',
+'SPURS', 'SUNS', 'HOUSTONROCKETS', 'WARRIORS', 'ATLHAWKS', 'MEMGRIZZ', 'BUCKS', 'RAPTORS', 'SACRAMENTOKINGS', 'SIXERS', 'TRAILBLAZERS'];
+
+nbaSmall=['Warriors', 'atlhawks']
 
 def scroll_down():
-    #scroll to bottom of page
+     #scroll to bottom of page
     lastHeight = driver.execute_script("return document.body.scrollHeight")
         
     while True:
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(.5)
+        time.sleep(1)
         newHeight = driver.execute_script("return document.body.scrollHeight")
         if newHeight == lastHeight:
-         	break
+            break
+        lastHeight = newHeight
+    
+        driver.maximize_window()
+
+        time.sleep(.5)
+
+def scroll_down_overlay():    
+    per_over = driver.find_element_by_id('permalink-overlay-dialog')
+    lastHeight = per_over.size['height']
+
+    while True:
+        print("DOWN")
+        driver.execute_script("document.getElementById('permalink-overlay').scrollTo(0, -250);")
+        time.sleep(1)
+        newHeight = per_over.size['height']
+        print(str(newHeight) + " " + str(lastHeight))
+        if newHeight == lastHeight:
+            break
+        lastHeight = newHeight
+    
+        driver.maximize_window()
+
+        time.sleep(.5)
+
+def scroll_up_overlay():
+    per_over = driver.find_element_by_id('permalink-overlay-dialog')
+    lastHeight = per_over.size['height']
+
+    while True:
+        print("UP")
+        driver.execute_script("document.getElementById('permalink-overlay').scrollTo(0, " + str(lastHeight) + ");")
+        time.sleep(1)
+        newHeight = per_over.size['height']
+        print(str(newHeight) + " " + str(lastHeight))
+        if newHeight == lastHeight:
+            break
         lastHeight = newHeight
     
         driver.maximize_window()
@@ -53,10 +93,21 @@ def scroll_down():
         time.sleep(.5)
 
 def load_page(url):
+    #countPage()
     driver.get(url) 
     time.sleep(1)
-        
+
     scroll_down()
+
+def load_page_tweet(url):
+    #countPage()
+    driver.get(url) 
+    time.sleep(1)
+
+
+    scroll_up_overlay()
+
+    scroll_down_overlay()
         
 
 def check_exists_by_id(id):
@@ -88,8 +139,7 @@ def getTweets(sender, to):
         
         
         headtweets = {}
-        convs = {}
-        
+        convs = {}        
         
         #loop through every tweet in mentions
         count = 1
@@ -98,10 +148,9 @@ def getTweets(sender, to):
             count = count + 1
             textcontent = i.find("p", {"class": "tweet-text"})
             
-            #print("Tweet: " + textcontent.get_text())
-            
             #make sure it is a reply
             isthisareply = i.find_all("div", {"class": "ReplyingToContextBelowAuthor"})
+
             if (len(isthisareply) > 0):
                 
 
@@ -111,9 +160,9 @@ def getTweets(sender, to):
                 replyusers = []
 
                 for b in test:
-                    replyusers.append(b['screen_name'])
+                    replyusers.append(b['screen_name'].upper())
 
-                valid = set(nba) - set([sender])
+                valid = set(NBACAPS) - set([sender.upper()])
 
                 isNba = False
                 for username in replyusers:
@@ -121,6 +170,9 @@ def getTweets(sender, to):
                         isNba = True
 
                 if isNba:
+
+                    print("\nTweet: " + textcontent.get_text())
+
                     tweet_div = i.find_all("div", {"class": "tweet"})
                     data_permalink_path = str(tweet_div[0]['data-permalink-path'])
 
@@ -129,7 +181,7 @@ def getTweets(sender, to):
                     finished = False
 
                     while(not finished):
-                        load_page(convo_url)
+                        load_page_tweet(convo_url)
 
                         soup = BeautifulSoup(driver.page_source, "lxml")
                         overlay = soup.find("div", {"class": "permalink-container"})
@@ -154,7 +206,8 @@ def getTweets(sender, to):
                                     
                                     headtweet = topstream[0].find("p", {"class": "tweet-text"}).get_text()
                                     
-                                    #print("added")
+                                    print("HEAD: " + headtweet)
+                                    print("add tweet")
                                     conv.append(headtweet)
                                     conv.append(sender)
                                     conv.append(to) 
@@ -201,8 +254,8 @@ def getTweets(sender, to):
                                         cc = 0 
                                         seen = []
                                         for n in user_names:
-                                            name = n[1:]
-                                            if name in nba:
+                                            name = n[1:].upper()
+                                            if name in NBACAPS:
                                                 if name not in seen:
                                                     seen.append(name)
                                                     cc = cc + 1
@@ -220,7 +273,7 @@ def getTweets(sender, to):
                                             headtweets[headtweet] = len(tweets)
                                             finished = True
                                         else:
-                                            #print("Not a convo")
+                                            print("Not a convo")
                                             finished = True
                                     else:
                                         print("We saw this already")
@@ -230,13 +283,14 @@ def getTweets(sender, to):
                                     print("this is a problem")             
                             else:
                                 print("Tweet: " + textcontent.get_text())
-                                print("--- this is a problem-----")           
+                                print("--- No ancestors, must have been deleted ---") 
+                                finished = True          
                         else:
                             print("----- no overlay ------") 
                         
                 else:
                     1 + 1
-                    #print("----- not a nba team ------")
+                    print("----- not a nba team ------")
             else:
                 1 + 1
                 #print("----- not a reply ------")
@@ -258,13 +312,12 @@ def findData(teams):
                 temp = getTweets(f,t)
                 if (temp):
                     table = table + temp
-                    print("relation finished " + str(c) + " size is " + str(len(table)))
+                    print("\nrelation finished " + str(c) + " size is " + str(len(table)))
                 else:
-                    print("relation finished " + str(c) + " size is " + str(len(table)))
+                    print("\nrelation finished " + str(c) + " size is " + str(len(table)))
                 c = c + 1
     return table
 
-   
 result = findData(nbaSmall)
 print("done")
 df = pd.DataFrame(result, columns=['head', 'from', 'to', 'tweets', 'size', 'dates', 'names', 'size2', 'usernames'])
