@@ -38,7 +38,18 @@ NBACAPS = ['CAVS','OKCTHUNDER','CELTICS','NYKNICKS','BROOKLYNNETS','PELICANSNBA'
 'HORNETS', 'DETROITPISTONS', 'DALLASMAVS', 'LACLIPPERS', 'LAKERS', 'UTAHJAZZ', 'NUGGETS', 'WASHWIZARDS', 'CHICAGOBULLS',
 'SPURS', 'SUNS', 'HOUSTONROCKETS', 'WARRIORS', 'ATLHAWKS', 'MEMGRIZZ', 'BUCKS', 'RAPTORS', 'SACRAMENTOKINGS', 'SIXERS', 'TRAILBLAZERS'];
 
-nbaSmall=['Warriors', 'atlhawks']
+nbaSmall=['okcthunder','celtics','NYKnicks','BrooklynNets','PelicansNBA', 'Pacers', 'OrlandoMagic']
+
+pages_visited = 0
+empty_relations = 0
+
+def countPage():
+    global pages_visited
+    pages_visited = pages_visited + 1
+
+def countEmptyRelation():
+    global empty_relations
+    empty_relations = empty_relations + 1
 
 def scroll_down():
      #scroll to bottom of page
@@ -56,51 +67,72 @@ def scroll_down():
 
         time.sleep(.5)
 
-def scroll_down_overlay():    
-    per_over = driver.find_element_by_id('permalink-overlay-dialog')
-    lastHeight = per_over.size['height']
+def scroll_down_overlay():  
 
-    while True:
-        print("DOWN")
-        driver.execute_script("document.getElementById('permalink-overlay').scrollTo(0, -250);")
-        time.sleep(1)
-        newHeight = per_over.size['height']
-        print(str(newHeight) + " " + str(lastHeight))
-        if newHeight == lastHeight:
-            break
-        lastHeight = newHeight
-    
-        driver.maximize_window()
+    notRead = False
+    while (notRead): 
 
-        time.sleep(.5)
+        if check_exists_by_id('permalink-overlay-dialog'):
+
+            per_over = driver.find_element_by_id('permalink-overlay-dialog')
+
+
+            lastHeight = per_over.size['height']
+
+            while True:
+                driver.execute_script("document.getElementById('permalink-overlay').scrollTo(0, -250);")
+                time.sleep(1)
+                newHeight = per_over.size['height']
+                if newHeight == lastHeight:
+                    break
+                lastHeight = newHeight
+            
+                driver.maximize_window()
+
+                time.sleep(.5)
+
+                notRead = True
+
+        else:
+            print("No dialog overlay")
 
 def scroll_up_overlay():
-    per_over = driver.find_element_by_id('permalink-overlay-dialog')
-    lastHeight = per_over.size['height']
 
-    while True:
-        print("UP")
-        driver.execute_script("document.getElementById('permalink-overlay').scrollTo(0, " + str(lastHeight) + ");")
-        time.sleep(1)
-        newHeight = per_over.size['height']
-        print(str(newHeight) + " " + str(lastHeight))
-        if newHeight == lastHeight:
-            break
-        lastHeight = newHeight
-    
-        driver.maximize_window()
+    notRead = False
+    while (notRead):
+        
 
-        time.sleep(.5)
+        if check_exists_by_id('permalink-overlay-dialog'):
+
+            per_over = driver.find_element_by_id('permalink-overlay-dialog')
+
+            lastHeight = per_over.size['height']
+
+            while True:
+                driver.execute_script("document.getElementById('permalink-overlay').scrollTo(0, " + str(lastHeight) + ");")
+                time.sleep(1)
+                newHeight = per_over.size['height']
+                if newHeight == lastHeight:
+                    break
+                lastHeight = newHeight
+            
+                driver.maximize_window()
+
+                time.sleep(.5)
+
+            notRead = True
+        else:
+            print("No dialog overlay")
 
 def load_page(url):
-    #countPage()
+    countPage()
     driver.get(url) 
     time.sleep(1)
 
     scroll_down()
 
 def load_page_tweet(url):
-    #countPage()
+    countPage()
     driver.get(url) 
     time.sleep(1)
 
@@ -120,7 +152,7 @@ def check_exists_by_id(id):
 #get all conversations from on sender to one reciever
 def getTweets(sender, to):
     
-    #print("---- START -------")
+    print("From: " + sender + " To: " + to)
     #load page
     load_page("https://twitter.com/search?q=from%3A" + sender + "%20%40" + to + "&src=typd") 
     
@@ -132,7 +164,8 @@ def getTweets(sender, to):
        
     #if no tweets between return empty
     if (stream is None):
-        print("fail")
+        countEmptyRelation()
+        print("No tweets for this relation")
     else:
         
         items = stream.find_all("li", {"class": "stream-item"})
@@ -171,7 +204,7 @@ def getTweets(sender, to):
 
                 if isNba:
 
-                    print("\nTweet: " + textcontent.get_text())
+                    #print("\nTweet: " + textcontent.get_text())
 
                     tweet_div = i.find_all("div", {"class": "tweet"})
                     data_permalink_path = str(tweet_div[0]['data-permalink-path'])
@@ -206,8 +239,8 @@ def getTweets(sender, to):
                                     
                                     headtweet = topstream[0].find("p", {"class": "tweet-text"}).get_text()
                                     
-                                    print("HEAD: " + headtweet)
-                                    print("add tweet")
+                                    #print("HEAD: " + headtweet)
+                                    #print("add tweet")
                                     conv.append(headtweet)
                                     conv.append(sender)
                                     conv.append(to) 
@@ -267,23 +300,24 @@ def getTweets(sender, to):
                                             conv.append(len(tweets))
                                             conv.append(times)
                                             conv.append(names)
-                                            conv.append(len(names))
                                             conv.append(user_names)
                                             convs[headtweet] = conv
                                             headtweets[headtweet] = len(tweets)
                                             finished = True
                                         else:
-                                            print("Not a convo")
+                                            # print("Tweet: " + textcontent.get_text())
+                                            # print("Not a convo \n")
                                             finished = True
                                     else:
-                                        print("We saw this already")
+                                        # print("Tweet: " + textcontent.get_text())
+                                        # print("We saw this already \n")
                                         finished = True
                                 else:
                                     print("Tweet: " + textcontent.get_text())
-                                    print("this is a problem")             
+                                    print("this is a problem \n")             
                             else:
-                                print("Tweet: " + textcontent.get_text())
-                                print("--- No ancestors, must have been deleted ---") 
+                                # print("Tweet: " + textcontent.get_text())
+                                # print("--- No ancestors, must have been deleted --- \n") 
                                 finished = True          
                         else:
                             print("----- no overlay ------") 
@@ -303,24 +337,21 @@ def getTweets(sender, to):
 def findData(teams):
     table = []
     c = 0
-    teamcount = -1
     for f in teams:
-        #teamcount = teamcount + 1
-       # if (teamcount >13 and teamcount < 15):
         for t in teams:
             if t != f:
                 temp = getTweets(f,t)
                 if (temp):
                     table = table + temp
-                    print("\nrelation finished " + str(c) + " size is " + str(len(table)))
+                    print("relation finished " + str(c) + " size is " + str(len(table)) + "\n")
                 else:
-                    print("\nrelation finished " + str(c) + " size is " + str(len(table)))
+                    print("relation finished " + str(c) + " size is " + str(len(table)) + "\n")
                 c = c + 1
     return table
 
-result = findData(nbaSmall)
-print("done")
-df = pd.DataFrame(result, columns=['head', 'from', 'to', 'tweets', 'size', 'dates', 'names', 'size2', 'usernames'])
+result = findData(nba)
+print("Finished\nPages Visited: " + str(pages_visited) + "\nEmpty Relations: " + str(empty_relations))
+df = pd.DataFrame(result, columns=['head', 'from', 'to', 'tweets', 'size', 'dates', 'names', 'usernames'])
 df = df.sort_values('size', ascending=False).drop_duplicates('head')
 print(df)
 df.to_csv("nba-conv-test.csv", sep=',')
