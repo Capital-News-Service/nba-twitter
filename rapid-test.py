@@ -23,11 +23,10 @@ import json
 #Set up headless browser
 chrome_options = Options()
 chrome_options.add_argument("--headless")
-chrome_options.binary_location = 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'
 
 #Fill in path to chromedrive.exe here
 chromedriver = '/usr/bin/chromedriver/chromedriver'
-driver = webdriver.Chrome(chromedriver)
+driver = webdriver.Chrome(chromedriver, chrome_options=chrome_options)
 
 #This is ther list of accounts you would like to gather, put in their twitter usernames
 nba = ['cavs','okcthunder','celtics','NYKnicks','BrooklynNets','PelicansNBA', 'Pacers', 'OrlandoMagic','Timberwolves','MiamiHEAT',
