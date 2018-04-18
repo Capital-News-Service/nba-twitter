@@ -3,6 +3,7 @@
 #import libraries
 import pandas as pd
 import numpy as np
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
 #load twitter conv data gathered by the scraper
 df = pd.read_csv('/Users/jagluck/Documents/GitHub/nba-twitter/nba-conv.csv')
@@ -55,6 +56,7 @@ df = df.drop(['to'], axis=1)
 df = df.drop(['from'], axis=1)
 df['names'] = convertType(df['names'], False)
 df['usernames'] = convertType(df['usernames'], True)
+df['dates'] = convertType(df['dates'], True)
                 
 ## What is the typical converation size? ##########
 df['size'].describe()
@@ -103,11 +105,80 @@ for name in NBACAPS:
             convo_counts.append(countDuoConvos(name, name2))
                 
 convos = pd.DataFrame(
-        {'to': tos,
-         'from': froms,
+        {'team_1': tos,
+         'team_2': froms,
          'convo_count': convo_counts
         })
  
 convos = convos.sort_values(by='convo_count', ascending=False)       
 print(convos)
+
+# What percent of each team is sent to other teams
+
+team_name = []
+to_name = []
+percent = []
+for t_index, t_row in teams.iterrows():
+    total = t_row['participation']
+    name = t_row['name']
+    for c_index, c_row in convos.iterrows():
+        if (name == c_row['team_1']):
+            team_name.append(name)
+            to_name.append(c_row['team_2'])
+            count = c_row['convo_count']
+            if (count == 0):
+                percent.append(0)
+            else:
+                percent.append(c_row['convo_count']/total)
+            
+convo_percent = pd.DataFrame(
+        {'from': team_name,
+         'to': to_name,
+         'percent': percent
+        })
+        
+convo_percent = convo_percent.sort_values(by='percent', ascending=False)  
+print(convo_percent)
+
+# How has the number of conversations changed over time?
+
+years = []
+for index, row in df.iterrows():
+    year = row['dates'][0][-4:]
+    years.append(year)
+
+output = set()
+for x in years:
+    output.add(x)
+output = sorted(list(output))
+f_years = []
+counts = []
+
+for x in output:
+    f_years.append(x)
+    counts.append(years.count(x))
+    
+year_count = pd.DataFrame(
+        {'year': f_years,
+         'count': counts
+        }) 
+        
+print(year_count)
+
+# What was the language of the tweets like/ \sentiment analysis
+
+tweets = df['tweets']
+names = df['usernames']
+
+text = []
+name = []
+for tweet, name in zip(tweets, names):
+    print("hello")
+    for x, y in zip(tweet, name):
+        name.append(y)
+        print(y)
+        text.append(x)
+        
+print(name)
+    
 
