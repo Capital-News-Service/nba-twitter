@@ -97,10 +97,9 @@ def scroll_down_overlay():
 
 def scroll_up_overlay():
 
-    notRead = False
+    notRead = True
     while (notRead):
         
-
         if check_exists_by_id('permalink-overlay-dialog'):
 
             per_over = driver.find_element_by_id('permalink-overlay-dialog')
@@ -119,7 +118,13 @@ def scroll_up_overlay():
 
                 time.sleep(.5)
 
-            notRead = True
+            driver.execute_script("document.getElementById('permalink-overlay').scrollTo(0, -250);")
+            time.sleep(.5)
+            driver.execute_script("document.getElementById('permalink-overlay').scrollTo(0, " + str(lastHeight) + ");")
+
+            newHeight = per_over.size['height']
+            if newHeight == lastHeight:
+                notRead = False
         else:
             print("No dialog overlay")
 
@@ -134,7 +139,6 @@ def load_page_tweet(url):
     countPage()
     driver.get(url) 
     time.sleep(1)
-
 
     scroll_up_overlay()
 
@@ -213,6 +217,8 @@ def getTweets(sender, to):
                     finished = False
 
                     while(not finished):
+
+
                         load_page_tweet(convo_url)
 
                         soup = BeautifulSoup(driver.page_source, "lxml")
@@ -346,6 +352,7 @@ def findData(teams):
                 else:
                     print("relation finished " + str(c) + " size is " + str(len(table)) + "\n")
                 c = c + 1
+
     return table
 
 result = findData(nba)
@@ -353,7 +360,8 @@ print("Finished\nPages Visited: " + str(pages_visited) + "\nEmpty Relations: " +
 df = pd.DataFrame(result, columns=['head', 'from', 'to', 'tweets', 'size', 'dates', 'names', 'usernames'])
 df = df.sort_values('size', ascending=False).drop_duplicates('head')
 print(df)
-df.to_csv("nba-conv-test.csv", sep=',')
+df.to_csv("nba-conv-test-2.csv", sep=',')
 driver.close()
+
 
 
