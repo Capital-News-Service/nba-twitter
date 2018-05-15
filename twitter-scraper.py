@@ -94,6 +94,7 @@ def scroll_down_overlay():
 
         else:
             print("No dialog overlay")
+            notRead = True
 
 def scroll_up_overlay():
 
@@ -127,6 +128,7 @@ def scroll_up_overlay():
                 notRead = False
         else:
             print("No dialog overlay")
+            notRead = False
 
 def load_page(url):
     countPage()
