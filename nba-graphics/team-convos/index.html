@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+
+    <title>
+      Capital News Service
+    </title>
+
+    <link href="https://fonts.googleapis.com/css?family=Droid+Serif:400,400i,700,700i|Poppins:300,400,500,600,700&amp;subset=latin-ext" rel="stylesheet">
+    
+    <!-- Load c3.css -->
+  <link href="css/c3.css" rel="stylesheet">
+
+  <!-- Load our css -->
+  <link href="css/css.css" rel="stylesheet">
+
+  <!-- Load d3.js and c3.js -->
+  <script src="js/d3.min.js" charset="utf-8"></script>
+  <script src="js/c3.min.js"></script>
+
+  </head>
+
+  <body>
+    <div id="container">
+      <h1 class="highcharts-title">Total Conversations by team</h1>
+
+      <text class="highcharts-subtitle" y="60">
+        <tspan>BY JAKE GLUCK</tspan>
+        <!-- ^^ PUT YOUR NAME HERE, TAKE CREDIT FOR YOUR COOL WORK ^^ -->
+        <tspan onclick="location.href=&quot;http://cnsmaryland.org&quot;"> | CAPITAL NEWS SERVICE</tspan>
+        <br>
+      <div id="line"></div>
+        <!--<span style="height:8px; font-size:4pt; background-color:#fbd603 ; color:#fbd603 ;">____________________________________________________________________________________________________________________________</span>-->
+      </text>
+      <div id="chart"></div>
+      <div id="source"><text><a href="http://cnsmaryland.org/home"><tspan>Source: Capital News Service</tspan></a></text></div>
+      <!-- ^^ PUT YOUR SOURCE HERE AND LINK IT^^ -->
+    </div>
+    <script type="text/javascript">
+
+    //  THE DOCUMENTATION FOR C3 IS HERE http://c3js.org/reference.html
+    //  USE IT TO LOOK UP ANY ADDITIONAL OPTIONS YOU WOULD LIKE TO ADD
+    //  SOME HELPFULL FEATURES INCLUDE REGIONS, HIGHLIGHTING SPECIFIC POINTS, GRID LINES, SHOWING MULTIPLE CHARTS AT THE SAME TIME 
+    x = ['x','TRAIL BLAZERS','HAWKS','KINGS','SUNS','TIMBER WOLVES','CELTICS','HEAT','KNICKS','THUNDER','LAKERS'];
+    //  ^^ ENTER YOUR X-AXIS LABELS HERE ^^
+        convos = ['Conversations', 439, 409, 304, 224, 222, 35, 29, 19, 17, 12];
+
+        // ['Conversations', 439,409,304,224,222,192,186,185,184,181,161,136,130,125,109,106, 87, 86, 78, 75, 74, 65, 56, 40, 35, 35, 29, 19, 17, 12],
+        // ['x','TRAILBLAZERS','ATLHAWKS','SACRAMENTOKINGS','SUNS','TIMBERWOLVES','SIXERS','UTAHJAZZ','BUCKS','MEMGRIZZ','LACLIPPERS','WARRIORS','NUGGETS','ORLANDOMAGIC','WASHWIZARDS','RAPTORS','PELICANSNBA','DALLASMAVS','BROOKLYNNETS','DETROITPISTONS','CAVS','HORNETS',' HOUSTONROCKETS','SPURS','CHICAGOBULLS','PACERS','CELTICS','MIAMIHEAT','NYKNICKS','OKCTHUNDER','LAKERS']
+    //  ^^ ENTER YOUR DATA HERE, THE FIRST VALUE IS A STRING THAT IS THE NAME OF YOUR CATEGORY ^^
+    var chart = c3.generate({
+        padding: {
+        bottom: 20
+      },
+      data: {
+        x: 'x',
+      colors: {
+        Conversations:'#000000'
+      },
+          columns: [
+            x,
+            convos
+            //MAKE SURE THESE MATCH THE DATA YOU CREATED ABOVE
+          ],
+
+          type: 'bar'
+          //  ^^ INSERT CHART TYPE ABOVE. FOR THE PURPOSES OF THIS TEMPLATE, USE BAR, AREA, SCATTER, LINE OR SPLINE ^^
+      },
+      legend: {
+        show: false
+      },
+      bar: {
+          width: {
+              ratio: .75 // this makes bar width 75% of length between ticks
+          }
+      },
+      zoom: {
+        enabled: false
+      },
+      axis:{
+        y : {
+          label: {
+            text: 'Total conversations involving each team',
+            position: 'outer-bottom'
+            //Y POSITION VALUES INCLUDE inner-top, inner-middle, inner-bottom, outer-top, outer-middle, outer-bottom
+        },
+        tick: {
+              //count: 14,
+          //format: function (d) { return Math.round(d)}
+              //IF YOU WANT TO SET THE EXACT NUMBER OF TICKS ON THE Y AXIS UNCOMMENT AND CHANGE THIS NUMBER
+          }
+          // ,
+          // min: 1,
+          // max: 10
+          //SET MIN AND MAX TICK ON Y AXIS ^^^^^^^
+        },
+        x :{
+          type: 'category',
+          tick: {
+            culling: false,
+            rotate: 0
+          },
+          label: {
+            //text: 'Year',
+            position: 'outer-center'
+            //HERE IS YOUR X AXIS LABEL UNCOMMENT IF YOU NEED IT
+            //X POSITION VALUES INCLUDE inner-right, inner-center, inner-left, outer-right, outer-center, outer-left
+        }
+      }
+    },  
+    tooltip: {
+        grouped: true, // Default true
+        //THIS WILL SHOW ALL CATEGORIES IN ONE TOOTIP VS DIFFERENT ONES
+
+        format: {
+          value: function(value) {
+            return value + " conversations";
+          }
+        }
+    },
+    zoom: {
+        enabled: false
+        //CHANGE TO TRUE IF YOU WANT TO BE ABLE TO ZOOM
+    },
+    padding: {
+      bottom: 0
+    },
+        
+        // ,
+        // oninit: function () {
+       //    this.main.append('rect')
+       //        .style('fill', 'white')
+       //        .attr('x', 0.5)
+       //        .attr('y', -0.5)
+       //        .attr('width', this.width)
+       //        .attr('height', this.height)
+       //      .transition().duration(3000)
+       //        .attr('x', this.width)
+       //        .attr('width', 0)
+       //      .remove();
+        // }
+        //UNCOMMENT ALL THIS IF YOU WANT THE DATA TO ANIMATE LEFT TO RIGHT
+    });
+   </script>
+  </body>
+ 
+</html>

@@ -26,7 +26,7 @@ chrome_options.add_argument("--headless")
 
 #Fill in path to chromedrive.exe here
 chromedriver = '/usr/bin/chromedriver/chromedriver'
-driver = webdriver.Chrome(chromedriver, chrome_options=chrome_options)
+driver = webdriver.Chrome(chromedriver)
 
 #This is ther list of accounts you would like to gather, put in their twitter usernames
 nba = ['cavs','okcthunder','celtics','NYKnicks','BrooklynNets','PelicansNBA', 'Pacers', 'OrlandoMagic','Timberwolves','MiamiHEAT',
@@ -37,7 +37,7 @@ NBACAPS = ['CAVS','OKCTHUNDER','CELTICS','NYKNICKS','BROOKLYNNETS','PELICANSNBA'
 'HORNETS', 'DETROITPISTONS', 'DALLASMAVS', 'LACLIPPERS', 'LAKERS', 'UTAHJAZZ', 'NUGGETS', 'WASHWIZARDS', 'CHICAGOBULLS',
 'SPURS', 'SUNS', 'HOUSTONROCKETS', 'WARRIORS', 'ATLHAWKS', 'MEMGRIZZ', 'BUCKS', 'RAPTORS', 'SACRAMENTOKINGS', 'SIXERS', 'TRAILBLAZERS'];
 
-nbaSmall=['okcthunder','celtics','NYKnicks','BrooklynNets','PelicansNBA', 'Pacers', 'OrlandoMagic']
+nbaSmall=['TRAILBLAZERS','WARRIORS','ATLHAWKS','BUCKS']
 
 pages_visited = 0
 empty_relations = 0
@@ -258,10 +258,12 @@ def getTweets(sender, to):
                                         timecontent = i2.find('span', {"class":"_timestamp"})
                                         tweets.append(textcontent.get_text())
                                         date = timecontent.get_text()
+                                        #if not from current year
                                         if (date[-4:-2] == '20'):
                                             times.append(date)
                                         else:
-                                            times.append(date + " 2017")
+                                            #if its from current year, need to update to be current year but just 2018 for now
+                                            times.append(date + " 2018")
                                         namecontent = i2.find("strong", {"class": "fullname"})
                                         names.append(namecontent.get_text())
                                         usernamecontent = i2.find("span", {"class": "username"})
@@ -276,10 +278,12 @@ def getTweets(sender, to):
                                         timecontent = i2.find('span', {"class":"_timestamp"})
                                         tweets.append(textcontent.get_text())
                                         date = timecontent.get_text()
+                                        #if not from current year
                                         if (date[-4:-2] == '20'):
                                             times.append(date)
                                         else:
-                                            times.append(date + " 2017")
+                                             #if its from current year, need to update to be current year but just 2018 for now
+                                            times.append(date + " 2018")
                                         namecontent = i2.find("strong", {"class": "fullname"})
                                         names.append(namecontent.get_text())
                                         usernamecontent = i2.find("span", {"class": "username"})
@@ -357,12 +361,12 @@ def findData(teams):
 
     return table
 
-result = findData(nba)
+result = findData(nbaSmall)
 print("Finished\nPages Visited: " + str(pages_visited) + "\nEmpty Relations: " + str(empty_relations))
 df = pd.DataFrame(result, columns=['head', 'from', 'to', 'tweets', 'size', 'dates', 'names', 'usernames'])
 df = df.sort_values('size', ascending=False).drop_duplicates('head')
 print(df)
-df.to_csv("nba-conv-test-2.csv", sep=',')
+df.to_csv("nba-conv-x.csv", sep=',')
 driver.close()
 
 
