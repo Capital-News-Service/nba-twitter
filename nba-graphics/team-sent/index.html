@@ -42,27 +42,30 @@
     //  THE DOCUMENTATION FOR C3 IS HERE http://c3js.org/reference.html
     //  USE IT TO LOOK UP ANY ADDITIONAL OPTIONS YOU WOULD LIKE TO ADD
     //  SOME HELPFULL FEATURES INCLUDE REGIONS, HIGHLIGHTING SPECIFIC POINTS, GRID LINES, SHOWING MULTIPLE CHARTS AT THE SAME TIME 
-    x = ['x','HAWKS ','MAVS','WIZARDS','MAGIC','PACERS','SPURS','THUNDER','SIXERS','CELTICS','LAKERS'];
+    x = ['x',"HAWKS","MAVS","MAGIC","WIZARDS","PACERS","BULLS","PISTONS","WARRIORS","NETS","HORNETS","HEAT","KNICKS","TRAILBLAZERS","SUNS","PELICANS","JAZZ","RAPTORS","BUCKS","CLIPPERS","TIMBERWOLVES","KINGS","NUGGETS","GRIZZLIES","CAVS","ROCKETS","SPURS ","THUNDER","SIXERS","CELTICS","LAKERS"];
     //  ^^ ENTER YOUR X-AXIS LABELS HERE ^^
-        convos = ['Conversations', 0.203598,0.179497,0.176363,0.175202,0.171633,0.082646,0.079712,0.079014,0.068005,0.035125];
-        
+        sent = ['Sentimate',0.203188,0.179497,0.176229,0.175624,0.171633,0.168482,0.167368,0.162850,0.154759,0.152338,0.150329,0.147195,0.138800,0.138671,0.137511,0.137149,0.133163,0.113961,0.112590,0.109115,0.108266,0.103357,0.095970,0.086809,0.085744,0.081355,0.079712,0.075147,0.064914,0.035125];
 
-        // ['ATLHAWKS ','DALLASMAVS','WASHWIZARDS','ORLANDOMAGIC','PACERS','DETROITPISTONS','HORNETS','CHICAGOBULLS','BROOKLYNNETS','WARRIORS','MIAMIHEAT','NYKNICKS','PELICANSNBA','TRAILBLAZERS','SUNS','RAPTORS','UTAHJAZZ','BUCKS','TIMBERWOLVES','LACLIPPERS','SACRAMENTOKINGS','NUGGETS','MEMGRIZZ','CAVS','HOUSTONROCKETS','SPURS','OKCTHUNDER','SIXERS','CELTICS','LAKERS']  
 
-        // [0.203598,0.179497,0.176363,0.175202,0.171633,0.166127,0.157983,0.156690,0.154759,0.151652,0.150329,0.147195,0.137511,0.135854,0.134226,0.132248,0.128386,0.121740,0.113512,0.111760,0.107987,0.105486,0.094998,0.086809,0.085744,0.082646,0.079712,0.079014,0.068005,0.035125]
 
+
+
+    //  ^^ ENTER YOUR DATA HERE, THE FIRST VALUE IS A STRING THAT IS THE NAME OF YOUR CATEGORY ^^
     var chart = c3.generate({
         padding: {
         bottom: 20
       },
+      size: {
+        height:700
+      },
       data: {
         x: 'x',
       colors: {
-        Conversations:'#000000'
+        Sentimate:'#000000'
       },
           columns: [
+            sent,
             x,
-            convos
             //MAKE SURE THESE MATCH THE DATA YOU CREATED ABOVE
           ],
 
@@ -81,21 +84,13 @@
         enabled: false
       },
       axis:{
+        rotated: true,
         y : {
           label: {
-            text: 'Compound sentimate',
+            text: 'Average compound sentimate level',
             position: 'outer-bottom'
             //Y POSITION VALUES INCLUDE inner-top, inner-middle, inner-bottom, outer-top, outer-middle, outer-bottom
-        },
-        tick: {
-              //count: 14,
-          //format: function (d) { return Math.round(d)}
-              //IF YOU WANT TO SET THE EXACT NUMBER OF TICKS ON THE Y AXIS UNCOMMENT AND CHANGE THIS NUMBER
           }
-          // ,
-          // min: 1,
-          // max: 10
-          //SET MIN AND MAX TICK ON Y AXIS ^^^^^^^
         },
         x :{
           type: 'category',
@@ -124,25 +119,7 @@
     zoom: {
         enabled: false
         //CHANGE TO TRUE IF YOU WANT TO BE ABLE TO ZOOM
-    },
-    padding: {
-      bottom: 0
-    },
-        
-        // ,
-        // oninit: function () {
-       //    this.main.append('rect')
-       //        .style('fill', 'white')
-       //        .attr('x', 0.5)
-       //        .attr('y', -0.5)
-       //        .attr('width', this.width)
-       //        .attr('height', this.height)
-       //      .transition().duration(3000)
-       //        .attr('x', this.width)
-       //        .attr('width', 0)
-       //      .remove();
-        // }
-        //UNCOMMENT ALL THIS IF YOU WANT THE DATA TO ANIMATE LEFT TO RIGHT
+    }
     });
    </script>
   </body>

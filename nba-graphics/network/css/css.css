@@ -1,33 +1,39 @@
+/* Copyright 2013 Michael Bostock. All rights reserved. Do not copy. */
+
+@import url(//fonts.googleapis.com/css?family=PT+Serif|PT+Serif:b|PT+Serif:i|PT+Sans|PT+Sans:b);
+
 html {
   min-width: 1040px;
 }
 
-.cns body {
+.ocks-org body {
   background: #fcfcfa;
   color: #333;
+  font-family: "PT Serif", serif;
   margin: 1em auto 4em auto;
   position: relative;
   width: 960px;
 }
 
-.cns header,
-.cns footer,
-.cns aside,
-.cns h1,
-.cns h2,
-.cns h3,
-.cns h4 {
+.ocks-org header,
+.ocks-org footer,
+.ocks-org aside,
+.ocks-org h1,
+.ocks-org h2,
+.ocks-org h3,
+.ocks-org h4 {
+  font-family: "PT Sans", sans-serif;
 }
 
-.cns h1,
-.cns h2,
-.cns h3,
-.cns h4 {
+.ocks-org h1,
+.ocks-org h2,
+.ocks-org h3,
+.ocks-org h4 {
   color: #000;
 }
 
-.cns header,
-.cns footer {
+.ocks-org header,
+.ocks-org footer {
   color: #636363;
 }
 
@@ -59,14 +65,14 @@ footer {
   font-size: small;
 }
 
-.cns header aside,
-.cns footer aside {
+.ocks-org header aside,
+.ocks-org footer aside {
   float: left;
   margin-right: .5em;
 }
 
-.cns header aside:after,
-.cns footer aside:after {
+.ocks-org header aside:after,
+.ocks-org footer aside:after {
   padding-left: .5em;
   content: "/";
 }

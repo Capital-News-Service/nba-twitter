@@ -42,16 +42,22 @@
     //  THE DOCUMENTATION FOR C3 IS HERE http://c3js.org/reference.html
     //  USE IT TO LOOK UP ANY ADDITIONAL OPTIONS YOU WOULD LIKE TO ADD
     //  SOME HELPFULL FEATURES INCLUDE REGIONS, HIGHLIGHTING SPECIFIC POINTS, GRID LINES, SHOWING MULTIPLE CHARTS AT THE SAME TIME 
-    x = ['x','TRAIL BLAZERS','HAWKS','KINGS','SUNS','TIMBER WOLVES','CELTICS','HEAT','KNICKS','THUNDER','LAKERS'];
+    x = ['x', "TRAILBLAZERS","HAWKS","KINGS","TIMBERWOLVES","SUNS","SIXERS","CLIPPERS","GRIZZLIES","BUCKS","JAZZ","WARRIORS","MAGIC","NUGGETS","WIZARDS","RAPTORS","PELICANS","MAVS","NETS", "PISTONS","CAVS","HORNETS","ROCKETS","SPURS","BULLS","CELTICS","PACERS","HEAT","KNICKS","THUNDER","LAKERS"];
     //  ^^ ENTER YOUR X-AXIS LABELS HERE ^^
-        convos = ['Conversations', 439, 409, 304, 224, 222, 35, 29, 19, 17, 12];
+        convos = ['Conversations',438,414,304,233,233,193,184,184,178,173,157,133,131,124,110,106, 87, 86, 80, 75, 72, 65, 57, 41, 37, 35, 29, 19, 17, 12];
 
-        // ['Conversations', 439,409,304,224,222,192,186,185,184,181,161,136,130,125,109,106, 87, 86, 78, 75, 74, 65, 56, 40, 35, 35, 29, 19, 17, 12],
-        // ['x','TRAILBLAZERS','ATLHAWKS','SACRAMENTOKINGS','SUNS','TIMBERWOLVES','SIXERS','UTAHJAZZ','BUCKS','MEMGRIZZ','LACLIPPERS','WARRIORS','NUGGETS','ORLANDOMAGIC','WASHWIZARDS','RAPTORS','PELICANSNBA','DALLASMAVS','BROOKLYNNETS','DETROITPISTONS','CAVS','HORNETS',' HOUSTONROCKETS','SPURS','CHICAGOBULLS','PACERS','CELTICS','MIAMIHEAT','NYKNICKS','OKCTHUNDER','LAKERS']
+
+       
+
+
+
     //  ^^ ENTER YOUR DATA HERE, THE FIRST VALUE IS A STRING THAT IS THE NAME OF YOUR CATEGORY ^^
     var chart = c3.generate({
         padding: {
         bottom: 20
+      },
+      size: {
+        height:700
       },
       data: {
         x: 'x',
@@ -59,8 +65,8 @@
         Conversations:'#000000'
       },
           columns: [
+            convos,
             x,
-            convos
             //MAKE SURE THESE MATCH THE DATA YOU CREATED ABOVE
           ],
 
@@ -79,21 +85,13 @@
         enabled: false
       },
       axis:{
+        rotated: true,
         y : {
           label: {
             text: 'Total conversations involving each team',
             position: 'outer-bottom'
             //Y POSITION VALUES INCLUDE inner-top, inner-middle, inner-bottom, outer-top, outer-middle, outer-bottom
-        },
-        tick: {
-              //count: 14,
-          //format: function (d) { return Math.round(d)}
-              //IF YOU WANT TO SET THE EXACT NUMBER OF TICKS ON THE Y AXIS UNCOMMENT AND CHANGE THIS NUMBER
           }
-          // ,
-          // min: 1,
-          // max: 10
-          //SET MIN AND MAX TICK ON Y AXIS ^^^^^^^
         },
         x :{
           type: 'category',
@@ -122,25 +120,7 @@
     zoom: {
         enabled: false
         //CHANGE TO TRUE IF YOU WANT TO BE ABLE TO ZOOM
-    },
-    padding: {
-      bottom: 0
-    },
-        
-        // ,
-        // oninit: function () {
-       //    this.main.append('rect')
-       //        .style('fill', 'white')
-       //        .attr('x', 0.5)
-       //        .attr('y', -0.5)
-       //        .attr('width', this.width)
-       //        .attr('height', this.height)
-       //      .transition().duration(3000)
-       //        .attr('x', this.width)
-       //        .attr('width', 0)
-       //      .remove();
-        // }
-        //UNCOMMENT ALL THIS IF YOU WANT THE DATA TO ANIMATE LEFT TO RIGHT
+    }
     });
    </script>
   </body>

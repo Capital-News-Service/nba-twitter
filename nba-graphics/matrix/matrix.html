@@ -2,6 +2,14 @@
 <!DOCTYPE html>
 <html class="cns">
 <meta charset="utf-8">
+
+<!-- Load our css -->
+<link href="css/css.css" rel="stylesheet">
+
+<!-- Load d3.js and c3.js -->
+<script src="js/d3.min.js" charset="utf-8"></script>
+
+
 <style>
 
 .background {
@@ -18,622 +26,148 @@ text.active {
 
 </style>
 
-<!-- Load d3.js -->
-<script src="js/d3.min.js" charset="utf-8"></script>
-
-<script src="http://code.jquery.com/jquery-latest.min.js"></script>
-
-<!-- Load our css -->
-<link href="css/css.css" rel="stylesheet">
-
-<aside style="margin-top:80px;">
 <p>Order: <select id="order">
   <option value="name">by Name</option>
   <option value="count">by Frequency</option>
   <option value="group">by Cluster</option>
 </select>
 
-<p>This matrix diagram visualizes character co-occurrences in Victor Hugo’s <i><a href="http://en.wikipedia.org/wiki/Les_Misérables">Les Misérables</a></i>.
-
-<p>Each colored cell represents two characters that appeared in the same chapter; darker cells indicate characters that co-occurred more frequently.
-
-<p>Use the drop-down menu to reorder the matrix and explore the data.
-
-<p>Built with <a href="http://d3js.org/">d3.js</a>.
-</aside>
-
 <script>
 
-teams = {"data":
-  [
-    {"team1":"OKCTHUNDER","perc":0.411765,"team2":"TRAILBLAZERS"},
-    {"team1":"CELTICS","perc":0.257143,"team2":"TRAILBLAZERS"},
-    {"team1":"BROOKLYNNETS","perc":0.255814,"team2":"TRAILBLAZERS"},
-    {"team1":"LAKERS","perc":0.250000,"team2":"TRAILBLAZERS"},
-    {"team1":"HOUSTONROCKETS","perc":0.215385,"team2":"TRAILBLAZERS"},
-    {"team1":"LACLIPPERS","perc":0.204420,"team2":"TRAILBLAZERS"},
-    {"team1":"CHICAGOBULLS","perc":0.200000,"team2":"SUNS"},
-    {"team1":"CHICAGOBULLS","perc":0.200000,"team2":"SACRAMENTOKINGS"},
-    {"team1":"CHICAGOBULLS","perc":0.200000,"team2":"TRAILBLAZERS"},
-    {"team1":"PELICANSNBA","perc":0.179245,"team2":"TRAILBLAZERS"},
-    {"team1":"SIXERS","perc":0.177083,"team2":"SUNS"},
-    {"team1":"PACERS","perc":0.171429,"team2":"TRAILBLAZERS"},
-    {"team1":"HOUSTONROCKETS","perc":0.169231,"team2":"SACRAMENTOKINGS"},
-    {"team1":"BUCKS","perc":0.167568,"team2":"TRAILBLAZERS"},
-    {"team1":"LAKERS","perc":0.166667,"team2":"TIMBERWOLVES"},
-    {"team1":"LAKERS","perc":0.166667,"team2":"SACRAMENTOKINGS"},
-    {"team1":"CAVS","perc":0.160000,"team2":"SACRAMENTOKINGS"},
-    {"team1":"NYKNICKS","perc":0.157895,"team2":"SACRAMENTOKINGS"},
-    {"team1":"NYKNICKS","perc":0.157895,"team2":"TRAILBLAZERS"},
-    {"team1":"NYKNICKS","perc":0.157895,"team2":"UTAHJAZZ"},
-    {"team1":"NYKNICKS","perc":0.157895,"team2":"TIMBERWOLVES"},
-    {"team1":"DETROITPISTONS","perc":0.153846,"team2":"TRAILBLAZERS"},
-    {"team1":"HORNETS","perc":0.148649,"team2":"SIXERS"},
-    {"team1":"CAVS","perc":0.146667,"team2":"TRAILBLAZERS"},
-    {"team1":"SPURS","perc":0.142857,"team2":"TRAILBLAZERS"},
-    {"team1":"CELTICS","perc":0.142857,"team2":"WASHWIZARDS"},
-    {"team1":"MEMGRIZZ","perc":0.141304,"team2":"SACRAMENTOKINGS"},
-    {"team1":"NUGGETS","perc":0.139706,"team2":"SACRAMENTOKINGS"},
-    {"team1":"HOUSTONROCKETS","perc":0.138462,"team2":"TIMBERWOLVES"},
-    {"team1":"DALLASMAVS","perc":0.137931,"team2":"SUNS"},
-    {"team1":"SIXERS","perc":0.130208,"team2":"TRAILBLAZERS"},
-    {"team1":"RAPTORS","perc":0.128440,"team2":"TRAILBLAZERS"},
-    {"team1":"MEMGRIZZ","perc":0.125000,"team2":"TRAILBLAZERS"},
-    {"team1":"HORNETS","perc":0.121622,"team2":"UTAHJAZZ"},
-    {"team1":"LACLIPPERS","perc":0.121547,"team2":"SACRAMENTOKINGS"},
-    {"team1":"CAVS","perc":0.120000,"team2":"UTAHJAZZ"},
-    {"team1":"MEMGRIZZ","perc":0.119565,"team2":"NUGGETS"},
-    {"team1":"OKCTHUNDER","perc":0.117647,"team2":"SACRAMENTOKINGS"},
-    {"team1":"DETROITPISTONS","perc":0.115385,"team2":"SIXERS"},
-    {"team1":"DALLASMAVS","perc":0.114943,"team2":"TIMBERWOLVES"},
-    {"team1":"PACERS","perc":0.114286,"team2":"SACRAMENTOKINGS"},
-    {"team1":"CELTICS","perc":0.114286,"team2":"UTAHJAZZ"},
-    {"team1":"CELTICS","perc":0.114286,"team2":"LACLIPPERS"},
-    {"team1":"SUNS","perc":0.111607,"team2":"TRAILBLAZERS"},
-    {"team1":"ATLHAWKS","perc":0.110024,"team2":"SUNS"},
-    {"team1":"ATLHAWKS","perc":0.110024,"team2":"TIMBERWOLVES"},
-    {"team1":"SPURS","perc":0.107143,"team2":"TIMBERWOLVES"},
-    {"team1":"MIAMIHEAT","perc":0.103448,"team2":"SUNS"},
-    {"team1":"DALLASMAVS","perc":0.103448,"team2":"SIXERS"},
-    {"team1":"MIAMIHEAT","perc":0.103448,"team2":"RAPTORS"},
-    {"team1":"MIAMIHEAT","perc":0.103448,"team2":"ORLANDOMAGIC"},
-    {"team1":"MIAMIHEAT","perc":0.103448,"team2":"TRAILBLAZERS"},
-    {"team1":"DALLASMAVS","perc":0.103448,"team2":"TRAILBLAZERS"},
-    {"team1":"MIAMIHEAT","perc":0.103448,"team2":"SACRAMENTOKINGS"},
-    {"team1":"DETROITPISTONS","perc":0.102564,"team2":"TIMBERWOLVES"},
-    {"team1":"RAPTORS","perc":0.100917,"team2":"WARRIORS"},
-    {"team1":"CHICAGOBULLS","perc":0.100000,"team2":"MEMGRIZZ"},
-    {"team1":"ORLANDOMAGIC","perc":0.100000,"team2":"TIMBERWOLVES"},
-    {"team1":"SUNS","perc":0.098214,"team2":"TIMBERWOLVES"},
-    {"team1":"NUGGETS","perc":0.095588,"team2":"SIXERS"},
-    {"team1":"CAVS","perc":0.093333,"team2":"WARRIORS"},
-    {"team1":"ORLANDOMAGIC","perc":0.092308,"team2":"SUNS"},
-    {"team1":"HOUSTONROCKETS","perc":0.092308,"team2":"WASHWIZARDS"},
-    {"team1":"HOUSTONROCKETS","perc":0.092308,"team2":"MEMGRIZZ"},
-    {"team1":"DALLASMAVS","perc":0.091954,"team2":"NUGGETS"},
-    {"team1":"BUCKS","perc":0.091892,"team2":"TIMBERWOLVES"},
-    {"team1":"BUCKS","perc":0.091892,"team2":"SIXERS"},
-    {"team1":"DETROITPISTONS","perc":0.089744,"team2":"SUNS"},
-    {"team1":"NUGGETS","perc":0.088235,"team2":"UTAHJAZZ"},
-    {"team1":"NUGGETS","perc":0.088235,"team2":"SUNS"},
-    {"team1":"BUCKS","perc":0.086486,"team2":"SUNS"},
-    {"team1":"CELTICS","perc":0.085714,"team2":"TIMBERWOLVES"},
-    {"team1":"CELTICS","perc":0.085714,"team2":"MEMGRIZZ"},
-    {"team1":"PELICANSNBA","perc":0.084906,"team2":"SACRAMENTOKINGS"},
-    {"team1":"ORLANDOMAGIC","perc":0.084615,"team2":"TRAILBLAZERS"},
-    {"team1":"ORLANDOMAGIC","perc":0.084615,"team2":"SIXERS"},
-    {"team1":"LAKERS","perc":0.083333,"team2":"PACERS"},
-    {"team1":"LAKERS","perc":0.083333,"team2":"WASHWIZARDS"},
-    {"team1":"ATLHAWKS","perc":0.083130,"team2":"TRAILBLAZERS"},
-    {"team1":"LACLIPPERS","perc":0.082873,"team2":"TIMBERWOLVES"},
-    {"team1":"BROOKLYNNETS","perc":0.081395,"team2":"TIMBERWOLVES"},
-    {"team1":"HORNETS","perc":0.081081,"team2":"SACRAMENTOKINGS"},
-    {"team1":"HORNETS","perc":0.081081,"team2":"MEMGRIZZ"},
-    {"team1":"HORNETS","perc":0.081081,"team2":"SUNS"},
-    {"team1":"TIMBERWOLVES","perc":0.081081,"team2":"UTAHJAZZ"},
-    {"team1":"DALLASMAVS","perc":0.080460,"team2":"SACRAMENTOKINGS"},
-    {"team1":"DALLASMAVS","perc":0.080460,"team2":"UTAHJAZZ"},
-    {"team1":"CAVS","perc":0.080000,"team2":"TIMBERWOLVES"},
-    {"team1":"TRAILBLAZERS","perc":0.079727,"team2":"WARRIORS"},
-    {"team1":"ATLHAWKS","perc":0.078240,"team2":"BUCKS"},
-    {"team1":"DETROITPISTONS","perc":0.076923,"team2":"SACRAMENTOKINGS"},
-    {"team1":"TIMBERWOLVES","perc":0.076577,"team2":"TRAILBLAZERS"},
-    {"team1":"BUCKS","perc":0.075676,"team2":"LACLIPPERS"},
-    {"team1":"SACRAMENTOKINGS","perc":0.075658,"team2":"TRAILBLAZERS"},
-    {"team1":"CHICAGOBULLS","perc":0.075000,"team2":"NUGGETS"},
-    {"team1":"CHICAGOBULLS","perc":0.075000,"team2":"ORLANDOMAGIC"},
-    {"team1":"CHICAGOBULLS","perc":0.075000,"team2":"UTAHJAZZ"},
-    {"team1":"NUGGETS","perc":0.073529,"team2":"TIMBERWOLVES"},
-    {"team1":"RAPTORS","perc":0.073394,"team2":"SACRAMENTOKINGS"},
-    {"team1":"ATLHAWKS","perc":0.073350,"team2":"SIXERS"},
-    {"team1":"SUNS","perc":0.071429,"team2":"WARRIORS"},
-    {"team1":"MEMGRIZZ","perc":0.070652,"team2":"UTAHJAZZ"},
-    {"team1":"BROOKLYNNETS","perc":0.069767,"team2":"MEMGRIZZ"},
-    {"team1":"BROOKLYNNETS","perc":0.069767,"team2":"SACRAMENTOKINGS"},
-    {"team1":"ORLANDOMAGIC","perc":0.069231,"team2":"SACRAMENTOKINGS"},
-    {"team1":"SACRAMENTOKINGS","perc":0.069079,"team2":"SUNS"},
-    {"team1":"DALLASMAVS","perc":0.068966,"team2":"RAPTORS"},
-    {"team1":"MIAMIHEAT","perc":0.068966,"team2":"PELICANSNBA"},
-    {"team1":"HORNETS","perc":0.067568,"team2":"WASHWIZARDS"},
-    {"team1":"HORNETS","perc":0.067568,"team2":"SPURS"},
-    {"team1":"LACLIPPERS","perc":0.066298,"team2":"SUNS"},
-    {"team1":"ATLHAWKS","perc":0.066015,"team2":"SACRAMENTOKINGS"},
-    {"team1":"BUCKS","perc":0.064865,"team2":"UTAHJAZZ"},
-    {"team1":"DETROITPISTONS","perc":0.064103,"team2":"HORNETS"},
-    {"team1":"ATLHAWKS","perc":0.063570,"team2":"ORLANDOMAGIC"},
-    {"team1":"SACRAMENTOKINGS","perc":0.062500,"team2":"SIXERS"},
-    {"team1":"SIXERS","perc":0.062500,"team2":"WARRIORS"},
-    {"team1":"ORLANDOMAGIC","perc":0.061538,"team2":"WARRIORS"},
-    {"team1":"ORLANDOMAGIC","perc":0.061538,"team2":"UTAHJAZZ"},
-    {"team1":"HOUSTONROCKETS","perc":0.061538,"team2":"WARRIORS"},
-    {"team1":"LACLIPPERS","perc":0.060773,"team2":"MEMGRIZZ"},
-    {"team1":"LACLIPPERS","perc":0.060773,"team2":"NUGGETS"},
-    {"team1":"BUCKS","perc":0.059459,"team2":"DETROITPISTONS"},
-    {"team1":"OKCTHUNDER","perc":0.058824,"team2":"UTAHJAZZ"},
-    {"team1":"NUGGETS","perc":0.058824,"team2":"TRAILBLAZERS"},
-    {"team1":"ATLHAWKS","perc":0.058680,"team2":"WASHWIZARDS"},
-    {"team1":"BROOKLYNNETS","perc":0.058140,"team2":"WASHWIZARDS"},
-    {"team1":"SUNS","perc":0.058036,"team2":"UTAHJAZZ"},
-    {"team1":"DALLASMAVS","perc":0.057471,"team2":"WARRIORS"},
-    {"team1":"DALLASMAVS","perc":0.057471,"team2":"LACLIPPERS"},
-    {"team1":"SIXERS","perc":0.057292,"team2":"TIMBERWOLVES"},
-    {"team1":"CELTICS","perc":0.057143,"team2":"ORLANDOMAGIC"},
-    {"team1":"CELTICS","perc":0.057143,"team2":"DETROITPISTONS"},
-    {"team1":"CELTICS","perc":0.057143,"team2":"DALLASMAVS"},
-    {"team1":"PACERS","perc":0.057143,"team2":"TIMBERWOLVES"},
-    {"team1":"PACERS","perc":0.057143,"team2":"WARRIORS"},
-    {"team1":"CELTICS","perc":0.057143,"team2":"WARRIORS"},
-    {"team1":"PACERS","perc":0.057143,"team2":"UTAHJAZZ"},
-    {"team1":"PACERS","perc":0.057143,"team2":"WASHWIZARDS"},
-    {"team1":"CELTICS","perc":0.057143,"team2":"SPURS"},
-    {"team1":"CELTICS","perc":0.057143,"team2":"SACRAMENTOKINGS"},
-    {"team1":"CELTICS","perc":0.057143,"team2":"NUGGETS"},
-    {"team1":"TRAILBLAZERS","perc":0.056948,"team2":"UTAHJAZZ"},
-    {"team1":"PELICANSNBA","perc":0.056604,"team2":"SIXERS"},
-    {"team1":"PELICANSNBA","perc":0.056604,"team2":"WARRIORS"},
-    {"team1":"ATLHAWKS","perc":0.056235,"team2":"DALLASMAVS"},
-    {"team1":"ATLHAWKS","perc":0.056235,"team2":"LACLIPPERS"},
-    {"team1":"SACRAMENTOKINGS","perc":0.055921,"team2":"UTAHJAZZ"},
-    {"team1":"SACRAMENTOKINGS","perc":0.055921,"team2":"WARRIORS"},
-    {"team1":"SACRAMENTOKINGS","perc":0.055921,"team2":"TIMBERWOLVES"},
-    {"team1":"LACLIPPERS","perc":0.055249,"team2":"SIXERS"},
-    {"team1":"LACLIPPERS","perc":0.055249,"team2":"UTAHJAZZ"},
-    {"team1":"LACLIPPERS","perc":0.055249,"team2":"RAPTORS"},
-    {"team1":"RAPTORS","perc":0.055046,"team2":"UTAHJAZZ"},
-    {"team1":"MEMGRIZZ","perc":0.054348,"team2":"TIMBERWOLVES"},
-    {"team1":"MEMGRIZZ","perc":0.054348,"team2":"SPURS"},
-    {"team1":"HORNETS","perc":0.054054,"team2":"LACLIPPERS"},
-    {"team1":"BUCKS","perc":0.054054,"team2":"DALLASMAVS"},
-    {"team1":"ATLHAWKS","perc":0.053790,"team2":"WARRIORS"},
-    {"team1":"UTAHJAZZ","perc":0.053763,"team2":"WARRIORS"},
-    {"team1":"SPURS","perc":0.053571,"team2":"SUNS"},
-    {"team1":"SPURS","perc":0.053571,"team2":"WASHWIZARDS"},
-    {"team1":"CAVS","perc":0.053333,"team2":"DALLASMAVS"},
-    {"team1":"CAVS","perc":0.053333,"team2":"HORNETS"},
-    {"team1":"NYKNICKS","perc":0.052632,"team2":"WASHWIZARDS"},
-    {"team1":"NYKNICKS","perc":0.052632,"team2":"SIXERS"},
-    {"team1":"NYKNICKS","perc":0.052632,"team2":"WARRIORS"},
-    {"team1":"NYKNICKS","perc":0.052632,"team2":"SUNS"},
-    {"team1":"ATLHAWKS","perc":0.051345,"team2":"NUGGETS"},
-    {"team1":"DETROITPISTONS","perc":0.051282,"team2":"RAPTORS"},
-    {"team1":"DETROITPISTONS","perc":0.051282,"team2":"LACLIPPERS"},
-    {"team1":"MEMGRIZZ","perc":0.048913,"team2":"WASHWIZARDS"},
-    {"team1":"MEMGRIZZ","perc":0.048913,"team2":"PELICANSNBA"},
-    {"team1":"MEMGRIZZ","perc":0.048913,"team2":"SIXERS"},
-    {"team1":"ATLHAWKS","perc":0.048900,"team2":"UTAHJAZZ"},
-    {"team1":"ATLHAWKS","perc":0.048900,"team2":"PELICANSNBA"},
-    {"team1":"BUCKS","perc":0.048649,"team2":"NUGGETS"},
-    {"team1":"BUCKS","perc":0.048649,"team2":"WASHWIZARDS"},
-    {"team1":"BUCKS","perc":0.048649,"team2":"WARRIORS"},
-    {"team1":"BUCKS","perc":0.048649,"team2":"HORNETS"},
-    {"team1":"BUCKS","perc":0.048649,"team2":"SACRAMENTOKINGS"},
-    {"team1":"PELICANSNBA","perc":0.047170,"team2":"UTAHJAZZ"},
-    {"team1":"PELICANSNBA","perc":0.047170,"team2":"SUNS"},
-    {"team1":"SIXERS","perc":0.046875,"team2":"WASHWIZARDS"},
-    {"team1":"BROOKLYNNETS","perc":0.046512,"team2":"LACLIPPERS"},
-    {"team1":"BROOKLYNNETS","perc":0.046512,"team2":"SUNS"},
-    {"team1":"HOUSTONROCKETS","perc":0.046154,"team2":"ORLANDOMAGIC"},
-    {"team1":"HOUSTONROCKETS","perc":0.046154,"team2":"LACLIPPERS"},
-    {"team1":"ORLANDOMAGIC","perc":0.046154,"team2":"RAPTORS"},
-    {"team1":"HOUSTONROCKETS","perc":0.046154,"team2":"SUNS"},
-    {"team1":"DALLASMAVS","perc":0.045977,"team2":"ORLANDOMAGIC"},
-    {"team1":"DALLASMAVS","perc":0.045977,"team2":"HOUSTONROCKETS"},
-    {"team1":"DALLASMAVS","perc":0.045977,"team2":"HORNETS"},
-    {"team1":"RAPTORS","perc":0.045872,"team2":"SUNS"},
-    {"team1":"NUGGETS","perc":0.044118,"team2":"WARRIORS"},
-    {"team1":"MEMGRIZZ","perc":0.043478,"team2":"ORLANDOMAGIC"},
-    {"team1":"HORNETS","perc":0.040541,"team2":"TRAILBLAZERS"},
-    {"team1":"TIMBERWOLVES","perc":0.040541,"team2":"WASHWIZARDS"},
-    {"team1":"HORNETS","perc":0.040541,"team2":"NUGGETS"},
-    {"team1":"CAVS","perc":0.040000,"team2":"SPURS"},
-    {"team1":"CAVS","perc":0.040000,"team2":"SIXERS"},
-    {"team1":"CAVS","perc":0.040000,"team2":"PELICANSNBA"},
-    {"team1":"CAVS","perc":0.040000,"team2":"WASHWIZARDS"},
-    {"team1":"CAVS","perc":0.040000,"team2":"LACLIPPERS"},
-    {"team1":"CAVS","perc":0.040000,"team2":"MEMGRIZZ"},
-    {"team1":"ATLHAWKS","perc":0.039120,"team2":"DETROITPISTONS"},
-    {"team1":"ORLANDOMAGIC","perc":0.038462,"team2":"PELICANSNBA"},
-    {"team1":"DETROITPISTONS","perc":0.038462,"team2":"WARRIORS"},
-    {"team1":"MEMGRIZZ","perc":0.038043,"team2":"WARRIORS"},
-    {"team1":"BUCKS","perc":0.037838,"team2":"SPURS"},
-    {"team1":"PELICANSNBA","perc":0.037736,"team2":"TIMBERWOLVES"},
-    {"team1":"UTAHJAZZ","perc":0.037634,"team2":"WASHWIZARDS"},
-    {"team1":"NUGGETS","perc":0.036765,"team2":"ORLANDOMAGIC"},
-    {"team1":"TRAILBLAZERS","perc":0.036446,"team2":"WASHWIZARDS"},
-    {"team1":"SACRAMENTOKINGS","perc":0.036184,"team2":"SPURS"},
-    {"team1":"SPURS","perc":0.035714,"team2":"UTAHJAZZ"},
-    {"team1":"BROOKLYNNETS","perc":0.034884,"team2":"HOUSTONROCKETS"},
-    {"team1":"BROOKLYNNETS","perc":0.034884,"team2":"ORLANDOMAGIC"},
-    {"team1":"BROOKLYNNETS","perc":0.034884,"team2":"RAPTORS"},
-    {"team1":"MIAMIHEAT","perc":0.034483,"team2":"WASHWIZARDS"},
-    {"team1":"DALLASMAVS","perc":0.034483,"team2":"DETROITPISTONS"},
-    {"team1":"DALLASMAVS","perc":0.034483,"team2":"WASHWIZARDS"},
-    {"team1":"MIAMIHEAT","perc":0.034483,"team2":"SIXERS"},
-    {"team1":"MIAMIHEAT","perc":0.034483,"team2":"SPURS"},
-    {"team1":"MIAMIHEAT","perc":0.034483,"team2":"TIMBERWOLVES"},
-    {"team1":"DALLASMAVS","perc":0.034483,"team2":"MEMGRIZZ"},
-    {"team1":"ATLHAWKS","perc":0.034230,"team2":"HORNETS"},
-    {"team1":"ATLHAWKS","perc":0.034230,"team2":"CAVS"},
-    {"team1":"LACLIPPERS","perc":0.033149,"team2":"SPURS"},
-    {"team1":"LACLIPPERS","perc":0.033149,"team2":"PELICANSNBA"},
-    {"team1":"MEMGRIZZ","perc":0.032609,"team2":"RAPTORS"},
-    {"team1":"MEMGRIZZ","perc":0.032609,"team2":"SUNS"},
-    {"team1":"BUCKS","perc":0.032432,"team2":"ORLANDOMAGIC"},
-    {"team1":"ATLHAWKS","perc":0.031785,"team2":"RAPTORS"},
-    {"team1":"TIMBERWOLVES","perc":0.031532,"team2":"WARRIORS"},
-    {"team1":"ORLANDOMAGIC","perc":0.030769,"team2":"WASHWIZARDS"},
-    {"team1":"HOUSTONROCKETS","perc":0.030769,"team2":"SIXERS"},
-    {"team1":"HOUSTONROCKETS","perc":0.030769,"team2":"UTAHJAZZ"},
-    {"team1":"SACRAMENTOKINGS","perc":0.029605,"team2":"WASHWIZARDS"},
-    {"team1":"ATLHAWKS","perc":0.029340,"team2":"MEMGRIZZ"},
-    {"team1":"CELTICS","perc":0.028571,"team2":"HORNETS"},
-    {"team1":"CELTICS","perc":0.028571,"team2":"CHICAGOBULLS"},
-    {"team1":"CELTICS","perc":0.028571,"team2":"HOUSTONROCKETS"},
-    {"team1":"CELTICS","perc":0.028571,"team2":"SIXERS"},
-    {"team1":"PACERS","perc":0.028571,"team2":"RAPTORS"},
-    {"team1":"PACERS","perc":0.028571,"team2":"PELICANSNBA"},
-    {"team1":"LACLIPPERS","perc":0.027624,"team2":"WASHWIZARDS"},
-    {"team1":"LACLIPPERS","perc":0.027624,"team2":"WARRIORS"},
-    {"team1":"RAPTORS","perc":0.027523,"team2":"SIXERS"},
-    {"team1":"BUCKS","perc":0.027027,"team2":"PELICANSNBA"},
-    {"team1":"HORNETS","perc":0.027027,"team2":"TIMBERWOLVES"},
-    {"team1":"HORNETS","perc":0.027027,"team2":"ORLANDOMAGIC"},
-    {"team1":"HORNETS","perc":0.027027,"team2":"WARRIORS"},
-    {"team1":"BUCKS","perc":0.027027,"team2":"HOUSTONROCKETS"},
-    {"team1":"CAVS","perc":0.026667,"team2":"DETROITPISTONS"},
-    {"team1":"CAVS","perc":0.026667,"team2":"ORLANDOMAGIC"},
-    {"team1":"CAVS","perc":0.026667,"team2":"NUGGETS"},
-    {"team1":"CAVS","perc":0.026667,"team2":"CELTICS"},
-    {"team1":"CAVS","perc":0.026667,"team2":"RAPTORS"},
-    {"team1":"DETROITPISTONS","perc":0.025641,"team2":"WASHWIZARDS"},
-    {"team1":"DETROITPISTONS","perc":0.025641,"team2":"NUGGETS"},
-    {"team1":"DETROITPISTONS","perc":0.025641,"team2":"HOUSTONROCKETS"},
-    {"team1":"DETROITPISTONS","perc":0.025641,"team2":"SPURS"},
-    {"team1":"DETROITPISTONS","perc":0.025641,"team2":"UTAHJAZZ"},
-    {"team1":"DETROITPISTONS","perc":0.025641,"team2":"MEMGRIZZ"},
-    {"team1":"CHICAGOBULLS","perc":0.025000,"team2":"SIXERS"},
-    {"team1":"CHICAGOBULLS","perc":0.025000,"team2":"DALLASMAVS"},
-    {"team1":"CHICAGOBULLS","perc":0.025000,"team2":"TIMBERWOLVES"},
-    {"team1":"CHICAGOBULLS","perc":0.025000,"team2":"RAPTORS"},
-    {"team1":"CHICAGOBULLS","perc":0.025000,"team2":"LACLIPPERS"},
-    {"team1":"CHICAGOBULLS","perc":0.025000,"team2":"HORNETS"},
-    {"team1":"CHICAGOBULLS","perc":0.025000,"team2":"PACERS"},
-    {"team1":"CHICAGOBULLS","perc":0.025000,"team2":"WASHWIZARDS"},
-    {"team1":"CHICAGOBULLS","perc":0.025000,"team2":"SPURS"},
-    {"team1":"BROOKLYNNETS","perc":0.023256,"team2":"NUGGETS"},
-    {"team1":"BROOKLYNNETS","perc":0.023256,"team2":"CHICAGOBULLS"},
-    {"team1":"BROOKLYNNETS","perc":0.023256,"team2":"PELICANSNBA"},
-    {"team1":"DALLASMAVS","perc":0.022989,"team2":"MIAMIHEAT"},
-    {"team1":"DALLASMAVS","perc":0.022989,"team2":"SPURS"},
-    {"team1":"DALLASMAVS","perc":0.022989,"team2":"NYKNICKS"},
-    {"team1":"NUGGETS","perc":0.022059,"team2":"SPURS"},
-    {"team1":"NUGGETS","perc":0.022059,"team2":"PELICANSNBA"},
-    {"team1":"NUGGETS","perc":0.022059,"team2":"WASHWIZARDS"},
-    {"team1":"ATLHAWKS","perc":0.022005,"team2":"BROOKLYNNETS"},
-    {"team1":"BUCKS","perc":0.021622,"team2":"CAVS"},
-    {"team1":"ATLHAWKS","perc":0.019560,"team2":"SPURS"},
-    {"team1":"ATLHAWKS","perc":0.019560,"team2":"CELTICS"},
-    {"team1":"PELICANSNBA","perc":0.018868,"team2":"SPURS"},
-    {"team1":"WARRIORS","perc":0.018634,"team2":"WASHWIZARDS"},
-    {"team1":"RAPTORS","perc":0.018349,"team2":"WASHWIZARDS"},
-    {"team1":"RAPTORS","perc":0.018349,"team2":"TIMBERWOLVES"},
-    {"team1":"SPURS","perc":0.017857,"team2":"WARRIORS"},
-    {"team1":"SUNS","perc":0.017857,"team2":"WASHWIZARDS"},
-    {"team1":"MEMGRIZZ","perc":0.016304,"team2":"MIAMIHEAT"},
-    {"team1":"BUCKS","perc":0.016216,"team2":"MEMGRIZZ"},
-    {"team1":"SIXERS","perc":0.015625,"team2":"UTAHJAZZ"},
-    {"team1":"HOUSTONROCKETS","perc":0.015385,"team2":"PELICANSNBA"},
-    {"team1":"HOUSTONROCKETS","perc":0.015385,"team2":"NYKNICKS"},
-    {"team1":"HOUSTONROCKETS","perc":0.015385,"team2":"SPURS"},
-    {"team1":"ORLANDOMAGIC","perc":0.015385,"team2":"PACERS"},
-    {"team1":"NUGGETS","perc":0.014706,"team2":"NYKNICKS"},
-    {"team1":"NUGGETS","perc":0.014706,"team2":"PACERS"},
-    {"team1":"NUGGETS","perc":0.014706,"team2":"RAPTORS"},
-    {"team1":"ATLHAWKS","perc":0.014670,"team2":"HOUSTONROCKETS"},
-    {"team1":"HORNETS","perc":0.013514,"team2":"RAPTORS"},
-    {"team1":"HORNETS","perc":0.013514,"team2":"LAKERS"},
-    {"team1":"HORNETS","perc":0.013514,"team2":"PELICANSNBA"},
-    {"team1":"CAVS","perc":0.013333,"team2":"CHICAGOBULLS"},
-    {"team1":"CAVS","perc":0.013333,"team2":"HOUSTONROCKETS"},
-    {"team1":"CAVS","perc":0.013333,"team2":"PACERS"},
-    {"team1":"DETROITPISTONS","perc":0.012821,"team2":"MIAMIHEAT"},
-    {"team1":"DETROITPISTONS","perc":0.012821,"team2":"NYKNICKS"},
-    {"team1":"DETROITPISTONS","perc":0.012821,"team2":"PACERS"},
-    {"team1":"DETROITPISTONS","perc":0.012821,"team2":"OKCTHUNDER"},
-    {"team1":"ATLHAWKS","perc":0.012225,"team2":"PACERS"},
-    {"team1":"BROOKLYNNETS","perc":0.011628,"team2":"HORNETS"},
-    {"team1":"BROOKLYNNETS","perc":0.011628,"team2":"BUCKS"},
-    {"team1":"BROOKLYNNETS","perc":0.011628,"team2":"DALLASMAVS"},
-    {"team1":"BROOKLYNNETS","perc":0.011628,"team2":"WARRIORS"},
-    {"team1":"BROOKLYNNETS","perc":0.011628,"team2":"SPURS"},
-    {"team1":"BROOKLYNNETS","perc":0.011628,"team2":"SIXERS"},
-    {"team1":"BROOKLYNNETS","perc":0.011628,"team2":"MIAMIHEAT"},
-    {"team1":"BROOKLYNNETS","perc":0.011628,"team2":"UTAHJAZZ"},
-    {"team1":"BROOKLYNNETS","perc":0.011628,"team2":"OKCTHUNDER"},
-    {"team1":"LACLIPPERS","perc":0.011050,"team2":"ORLANDOMAGIC"},
-    {"team1":"MEMGRIZZ","perc":0.010870,"team2":"OKCTHUNDER"},
-    {"team1":"BUCKS","perc":0.010811,"team2":"NYKNICKS"},
-    {"team1":"BUCKS","perc":0.010811,"team2":"CELTICS"},
-    {"team1":"BUCKS","perc":0.010811,"team2":"RAPTORS"},
-    {"team1":"SIXERS","perc":0.010417,"team2":"SPURS"},
-    {"team1":"ATLHAWKS","perc":0.009780,"team2":"CHICAGOBULLS"},
-    {"team1":"PELICANSNBA","perc":0.009434,"team2":"RAPTORS"},
-    {"team1":"PELICANSNBA","perc":0.009434,"team2":"WASHWIZARDS"},
-    {"team1":"RAPTORS","perc":0.009174,"team2":"SPURS"},
-    {"team1":"ORLANDOMAGIC","perc":0.007692,"team2":"SPURS"},
-    {"team1":"ATLHAWKS","perc":0.007335,"team2":"NYKNICKS"},
-    {"team1":"ATLHAWKS","perc":0.007335,"team2":"OKCTHUNDER"},
-    {"team1":"LACLIPPERS","perc":0.005525,"team2":"OKCTHUNDER"},
-    {"team1":"MEMGRIZZ","perc":0.005435,"team2":"NYKNICKS"},
-    {"team1":"MEMGRIZZ","perc":0.005435,"team2":"PACERS"},
-    {"team1":"BUCKS","perc":0.005405,"team2":"LAKERS"},
-    {"team1":"BUCKS","perc":0.005405,"team2":"CHICAGOBULLS"},
-    {"team1":"BUCKS","perc":0.005405,"team2":"PACERS"},
-    {"team1":"ATLHAWKS","perc":0.002445,"team2":"MIAMIHEAT"},
-    {"team1":"ATLHAWKS","perc":0.002445,"team2":"LAKERS"},
-    {"team1":"LAKERS","perc":0.000000,"team2":"NUGGETS"},
-    {"team1":"MIAMIHEAT","perc":0.000000,"team2":"PACERS"},
-    {"team1":"BROOKLYNNETS","perc":0.000000,"team2":"DETROITPISTONS"},
-    {"team1":"BROOKLYNNETS","perc":0.000000,"team2":"PACERS"},
-    {"team1":"MIAMIHEAT","perc":0.000000,"team2":"OKCTHUNDER"},
-    {"team1":"BROOKLYNNETS","perc":0.000000,"team2":"NYKNICKS"},
-    {"team1":"BROOKLYNNETS","perc":0.000000,"team2":"CAVS"},
-    {"team1":"BROOKLYNNETS","perc":0.000000,"team2":"LAKERS"},
-    {"team1":"MIAMIHEAT","perc":0.000000,"team2":"UTAHJAZZ"},
-    {"team1":"MIAMIHEAT","perc":0.000000,"team2":"NYKNICKS"},
-    {"team1":"LAKERS","perc":0.000000,"team2":"MIAMIHEAT"},
-    {"team1":"MIAMIHEAT","perc":0.000000,"team2":"NUGGETS"},
-    {"team1":"MIAMIHEAT","perc":0.000000,"team2":"WARRIORS"},
-    {"team1":"PACERS","perc":0.000000,"team2":"SPURS"},
-    {"team1":"LAKERS","perc":0.000000,"team2":"OKCTHUNDER"},
-    {"team1":"LAKERS","perc":0.000000,"team2":"SPURS"},
-    {"team1":"LAKERS","perc":0.000000,"team2":"PELICANSNBA"},
-    {"team1":"LAKERS","perc":0.000000,"team2":"SIXERS"},
-    {"team1":"BROOKLYNNETS","perc":0.000000,"team2":"CELTICS"},
-    {"team1":"PACERS","perc":0.000000,"team2":"SIXERS"},
-    {"team1":"LAKERS","perc":0.000000,"team2":"NYKNICKS"},
-    {"team1":"LAKERS","perc":0.000000,"team2":"RAPTORS"},
-    {"team1":"LAKERS","perc":0.000000,"team2":"UTAHJAZZ"},
-    {"team1":"LAKERS","perc":0.000000,"team2":"SUNS"},
-    {"team1":"LAKERS","perc":0.000000,"team2":"WARRIORS"},
-    {"team1":"LAKERS","perc":0.000000,"team2":"MEMGRIZZ"},
-    {"team1":"PACERS","perc":0.000000,"team2":"SUNS"},
-    {"team1":"LACLIPPERS","perc":0.000000,"team2":"MIAMIHEAT"},
-    {"team1":"HOUSTONROCKETS","perc":0.000000,"team2":"OKCTHUNDER"},
-    {"team1":"OKCTHUNDER","perc":0.000000,"team2":"WARRIORS"},
-    {"team1":"DETROITPISTONS","perc":0.000000,"team2":"ORLANDOMAGIC"},
-    {"team1":"CELTICS","perc":0.000000,"team2":"MIAMIHEAT"},
-    {"team1":"CELTICS","perc":0.000000,"team2":"PELICANSNBA"},
-    {"team1":"CELTICS","perc":0.000000,"team2":"LAKERS"},
-    {"team1":"CELTICS","perc":0.000000,"team2":"RAPTORS"},
-    {"team1":"CELTICS","perc":0.000000,"team2":"SUNS"},
-    {"team1":"CELTICS","perc":0.000000,"team2":"PACERS"},
-    {"team1":"CELTICS","perc":0.000000,"team2":"NYKNICKS"},
-    {"team1":"CELTICS","perc":0.000000,"team2":"OKCTHUNDER"},
-    {"team1":"OKCTHUNDER","perc":0.000000,"team2":"PELICANSNBA"},
-    {"team1":"OKCTHUNDER","perc":0.000000,"team2":"RAPTORS"},
-    {"team1":"OKCTHUNDER","perc":0.000000,"team2":"SUNS"},
-    {"team1":"OKCTHUNDER","perc":0.000000,"team2":"PACERS"},
-    {"team1":"OKCTHUNDER","perc":0.000000,"team2":"SIXERS"},
-    {"team1":"HOUSTONROCKETS","perc":0.000000,"team2":"PACERS"},
-    {"team1":"OKCTHUNDER","perc":0.000000,"team2":"SPURS"},
-    {"team1":"OKCTHUNDER","perc":0.000000,"team2":"ORLANDOMAGIC"},
-    {"team1":"OKCTHUNDER","perc":0.000000,"team2":"TIMBERWOLVES"},
-    {"team1":"OKCTHUNDER","perc":0.000000,"team2":"WASHWIZARDS"},
-    {"team1":"HORNETS","perc":0.000000,"team2":"MIAMIHEAT"},
-    {"team1":"HORNETS","perc":0.000000,"team2":"OKCTHUNDER"},
-    {"team1":"HORNETS","perc":0.000000,"team2":"HOUSTONROCKETS"},
-    {"team1":"HORNETS","perc":0.000000,"team2":"NYKNICKS"},
-    {"team1":"HORNETS","perc":0.000000,"team2":"PACERS"},
-    {"team1":"DALLASMAVS","perc":0.000000,"team2":"PELICANSNBA"},
-    {"team1":"DALLASMAVS","perc":0.000000,"team2":"LAKERS"},
-    {"team1":"DALLASMAVS","perc":0.000000,"team2":"PACERS"},
-    {"team1":"DALLASMAVS","perc":0.000000,"team2":"OKCTHUNDER"},
-    {"team1":"DETROITPISTONS","perc":0.000000,"team2":"PELICANSNBA"},
-    {"team1":"DETROITPISTONS","perc":0.000000,"team2":"LAKERS"},
-    {"team1":"NUGGETS","perc":0.000000,"team2":"OKCTHUNDER"},
-    {"team1":"NYKNICKS","perc":0.000000,"team2":"OKCTHUNDER"},
-    {"team1":"HOUSTONROCKETS","perc":0.000000,"team2":"RAPTORS"},
-    {"team1":"HOUSTONROCKETS","perc":0.000000,"team2":"LAKERS"},
-    {"team1":"HOUSTONROCKETS","perc":0.000000,"team2":"MIAMIHEAT"},
-    {"team1":"HOUSTONROCKETS","perc":0.000000,"team2":"NUGGETS"},
-    {"team1":"CHICAGOBULLS","perc":0.000000,"team2":"WARRIORS"},
-    {"team1":"CHICAGOBULLS","perc":0.000000,"team2":"PELICANSNBA"},
-    {"team1":"CHICAGOBULLS","perc":0.000000,"team2":"HOUSTONROCKETS"},
-    {"team1":"CHICAGOBULLS","perc":0.000000,"team2":"NYKNICKS"},
-    {"team1":"CHICAGOBULLS","perc":0.000000,"team2":"MIAMIHEAT"},
-    {"team1":"CHICAGOBULLS","perc":0.000000,"team2":"DETROITPISTONS"},
-    {"team1":"CHICAGOBULLS","perc":0.000000,"team2":"LAKERS"},
-    {"team1":"CHICAGOBULLS","perc":0.000000,"team2":"OKCTHUNDER"},
-    {"team1":"CAVS","perc":0.000000,"team2":"OKCTHUNDER"},
-    {"team1":"CAVS","perc":0.000000,"team2":"NYKNICKS"},
-    {"team1":"CAVS","perc":0.000000,"team2":"SUNS"},
-    {"team1":"CAVS","perc":0.000000,"team2":"LAKERS"},
-    {"team1":"CAVS","perc":0.000000,"team2":"MIAMIHEAT"},
-    {"team1":"LACLIPPERS","perc":0.000000,"team2":"NYKNICKS"},
-    {"team1":"LACLIPPERS","perc":0.000000,"team2":"PACERS"},
-    {"team1":"LACLIPPERS","perc":0.000000,"team2":"LAKERS"},
-    {"team1":"BUCKS","perc":0.000000,"team2":"OKCTHUNDER"},
-    {"team1":"BUCKS","perc":0.000000,"team2":"MIAMIHEAT"},
-    {"team1":"NYKNICKS","perc":0.000000,"team2":"PACERS"},
-    {"team1":"NYKNICKS","perc":0.000000,"team2":"RAPTORS"},
-    {"team1":"NYKNICKS","perc":0.000000,"team2":"PELICANSNBA"},
-    {"team1":"NYKNICKS","perc":0.000000,"team2":"SPURS"},
-    {"team1":"NYKNICKS","perc":0.000000,"team2":"ORLANDOMAGIC"},
-    {"team1":"LAKERS","perc":0.000000,"team2":"ORLANDOMAGIC"}
-  ]
-};
+var margin = {top: 80, right: 0, bottom: 10, left: 80},
+    width = 720,
+    height = 720;
 
-// var margin = {top: 80, right: 0, bottom: 10, left: 80},
-//     width = 720,
-//     height = 720;
+var x = d3.scale.ordinal().rangeBands([0, width]),
+    z = d3.scale.linear().domain([0, 4]).clamp(true),
+    c = d3.scale.category10().domain(d3.range(10));
 
-// var x = d3.scale.ordinal().rangeBands([0, width]),
-//     z = d3.scale.linear().domain([0, 4]).clamp(true),
-//     c = d3.scale.category10().domain(d3.range(10));
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .style("margin-left", -margin.left + "px")
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-// var svg = d3.select("body").append("svg")
-//     .attr("width", width + margin.left + margin.right)
-//     .attr("height", height + margin.top + margin.bottom)
-//     .style("margin-left", -margin.left + "px")
-//   .append("g")
-//     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+d3.json("teams.json", function(teams) {
+  var matrix = [],
+      nodes = teams.nodes,
+      n = nodes.length;
 
-
- 
-
-  // // Compute index per node.
-  // nodes.forEach(function(node, i) {
-  //   node.index = i;
-  //   node.count = 0;
-  //   matrix[i] = d3.range(n).map(function(j) { return {x: j, y: i, z: 0}; });
-  // });
-
-  
-  // Convert links to matrix; count character occurrences.
-
-  function build(teams){
-
-  
-  nodes = teams.data;
-  n = nodes.length;
-  var matrix = [n,3]
-
-  teams.data.forEach(function(link) {
-    
-
-    matrix[link.team1][link.team2].z += link.perc;
-
-
+  // Compute index per node.
+  nodes.forEach(function(node, i) {
+    node.index = i;
+    node.count = 0;
+    matrix[i] = d3.range(n).map(function(j) { return {x: j, y: i, z: 0}; });
   });
-}
 
+  // Convert links to matrix; count character occurrences.
+  teams.links.forEach(function(link) {
+    matrix[link.source][link.target].z += link.value * 10;
+    matrix[link.target][link.source].z += link.value * 10;
+    matrix[link.source][link.source].z += link.value * 10;
+    matrix[link.target][link.target].z += link.value * 10;
+    nodes[link.source].count += link.value;
+    nodes[link.target].count += link.value;
+  });
 
+  // Precompute the orders.
+  var orders = {
+    name: d3.range(n).sort(function(a, b) { return d3.ascending(nodes[a].name, nodes[b].name); }),
+    count: d3.range(n).sort(function(a, b) { return nodes[b].count - nodes[a].count; }),
+    group: d3.range(n).sort(function(a, b) { return nodes[b].group - nodes[a].group; })
+  };
 
-  // // Precompute the orders.
-  // var orders = {
-  //   name: d3.range(n).sort(function(a, b) { return d3.ascending(nodes[a].name, nodes[b].name); }),
-  //   count: d3.range(n).sort(function(a, b) { return nodes[b].count - nodes[a].count; }),
-  //   group: d3.range(n).sort(function(a, b) { return nodes[b].group - nodes[a].group; })
-  // };
+  // The default sort order.
+  x.domain(orders.name);
 
-  // // The default sort order.
-  // x.domain(orders.name);
+  svg.append("rect")
+      .attr("class", "background")
+      .attr("width", width)
+      .attr("height", height);
 
-  // svg.append("rect")
-  //     .attr("class", "background")
-  //     .attr("width", width)
-  //     .attr("height", height);
+  var row = svg.selectAll(".row")
+      .data(matrix)
+    .enter().append("g")
+      .attr("class", "row")
+      .attr("transform", function(d, i) { return "translate(0," + x(i) + ")"; })
+      .each(row);
 
-  // var row = svg.selectAll(".row")
-  //     .data(matrix)
-  //   .enter().append("g")
-  //     .attr("class", "row")
-  //     .attr("transform", function(d, i) { return "translate(0," + x(i) + ")"; })
-  //     .each(row);
+  row.append("line")
+      .attr("x2", width);
 
-  // row.append("line")
-  //     .attr("x2", width);
+  row.append("text")
+      .attr("x", -6)
+      .attr("y", x.rangeBand() / 2)
+      .attr("dy", ".32em")
+      .attr("text-anchor", "end")
+      .text(function(d, i) { return nodes[i].name; });
 
-  // row.append("text")
-  //     .attr("x", -6)
-  //     .attr("y", x.rangeBand() / 2)
-  //     .attr("dy", ".32em")
-  //     .attr("text-anchor", "end")
-  //     .text(function(d, i) { return nodes[i].name; });
+  var column = svg.selectAll(".column")
+      .data(matrix)
+    .enter().append("g")
+      .attr("class", "column")
+      .attr("transform", function(d, i) { return "translate(" + x(i) + ")rotate(-90)"; });
 
-  // var column = svg.selectAll(".column")
-  //     .data(matrix)
-  //   .enter().append("g")
-  //     .attr("class", "column")
-  //     .attr("transform", function(d, i) { return "translate(" + x(i) + ")rotate(-90)"; });
+  column.append("line")
+      .attr("x1", -width);
 
-  // column.append("line")
-  //     .attr("x1", -width);
+  column.append("text")
+      .attr("x", 6)
+      .attr("y", x.rangeBand() / 2)
+      .attr("dy", ".32em")
+      .attr("text-anchor", "start")
+      .text(function(d, i) { return nodes[i].name; });
 
-  // column.append("text")
-  //     .attr("x", 6)
-  //     .attr("y", x.rangeBand() / 2)
-  //     .attr("dy", ".32em")
-  //     .attr("text-anchor", "start")
-  //     .text(function(d, i) { return nodes[i].name; });
+  function row(row) {
+    var cell = d3.select(this).selectAll(".cell")
+        .data(row.filter(function(d) { return d.z; }))
+      .enter().append("rect")
+        .attr("class", "cell")
+        .attr("x", function(d) { return x(d.x); })
+        .attr("width", x.rangeBand())
+        .attr("height", x.rangeBand())
+        .style("fill-opacity", function(d) { return z(d.z); })
+        .style("fill", function(d) { return nodes[d.x].group == nodes[d.y].group ? c(nodes[d.x].group) : null; })
+        .on("mouseover", mouseover)
+        .on("mouseout", mouseout);
+  }
 
-  // function row(row) {
-  //   var cell = d3.select(this).selectAll(".cell")
-  //       .data(row.filter(function(d) { return d.z; }))
-  //     .enter().append("rect")
-  //       .attr("class", "cell")
-  //       .attr("x", function(d) { return x(d.x); })
-  //       .attr("width", x.rangeBand())
-  //       .attr("height", x.rangeBand())
-  //       .style("fill-opacity", function(d) { return z(d.z); })
-  //       .style("fill", function(d) { return nodes[d.x].group == nodes[d.y].group ? c(nodes[d.x].group) : null; })
-  //       .on("mouseover", mouseover)
-  //       .on("mouseout", mouseout);
-  // }
+  function mouseover(p) {
+    d3.selectAll(".row text").classed("active", function(d, i) { return i == p.y; });
+    d3.selectAll(".column text").classed("active", function(d, i) { return i == p.x; });
+  }
 
-//   function mouseover(p) {
-//     d3.selectAll(".row text").classed("active", function(d, i) { return i == p.y; });
-//     d3.selectAll(".column text").classed("active", function(d, i) { return i == p.x; });
-//   }
+  function mouseout() {
+    d3.selectAll("text").classed("active", false);
+  }
 
-//   function mouseout() {
-//     d3.selectAll("text").classed("active", false);
-//   }
+  d3.select("#order").on("change", function() {
+    clearTimeout(timeout);
+    order(this.value);
+  });
 
-//   d3.select("#order").on("change", function() {
-//     clearTimeout(timeout);
-//     order(this.value);
-//   });
+  function order(value) {
+    x.domain(orders[value]);
 
-//   function order(value) {
-//     x.domain(orders[value]);
+    var t = svg.transition().duration(2500);
 
-//     var t = svg.transition().duration(2500);
+    t.selectAll(".row")
+        .delay(function(d, i) { return x(i) * 4; })
+        .attr("transform", function(d, i) { return "translate(0," + x(i) + ")"; })
+      .selectAll(".cell")
+        .delay(function(d) { return x(d.x) * 4; })
+        .attr("x", function(d) { return x(d.x); });
 
-//     t.selectAll(".row")
-//         .delay(function(d, i) { return x(i) * 4; })
-//         .attr("transform", function(d, i) { return "translate(0," + x(i) + ")"; })
-//       .selectAll(".cell")
-//         .delay(function(d) { return x(d.x) * 4; })
-//         .attr("x", function(d) { return x(d.x); });
+    t.selectAll(".column")
+        .delay(function(d, i) { return x(i) * 4; })
+        .attr("transform", function(d, i) { return "translate(" + x(i) + ")rotate(-90)"; });
+  }
 
-//     t.selectAll(".column")
-//         .delay(function(d, i) { return x(i) * 4; })
-//         .attr("transform", function(d, i) { return "translate(" + x(i) + ")rotate(-90)"; });
-//   }
-
-//   var timeout = setTimeout(function() {
-//     order("group");
-//     d3.select("#order").property("selectedIndex", 2).node().focus();
-//   }, 5000);
-
-$(document).ready(function() {
-  build(teams);
+  var timeout = setTimeout(function() {
+    order("group");
+    d3.select("#order").property("selectedIndex", 2).node().focus();
+  }, 5000);
 });
-
-</script>
-
-<script>
 
 </script>
