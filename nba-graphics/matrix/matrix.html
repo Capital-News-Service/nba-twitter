@@ -29,7 +29,7 @@ text.active {
 <p>Order: <select id="order">
   <option value="name">by Name</option>
   <option value="count">by Frequency</option>
-  <option value="group">by Cluster</option>
+  <option value="group">by Conference</option>
 </select>
 
 <script>
@@ -49,7 +49,7 @@ var svg = d3.select("body").append("svg")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-d3.json("teams.json", function(teams) {
+d3.json("teams_num.json", function(teams) {
   var matrix = [],
       nodes = teams.nodes,
       n = nodes.length;
@@ -63,10 +63,10 @@ d3.json("teams.json", function(teams) {
 
   // Convert links to matrix; count character occurrences.
   teams.links.forEach(function(link) {
-    matrix[link.source][link.target].z += link.value * 10;
-    matrix[link.target][link.source].z += link.value * 10;
-    matrix[link.source][link.source].z += link.value * 10;
-    matrix[link.target][link.target].z += link.value * 10;
+    matrix[link.source][link.target].z += ((link.value - 5.710344827586207)/7.523374067023274) + .5;
+    matrix[link.target][link.source].z += ((link.value - 5.710344827586207)/7.523374067023274) + .5;
+    matrix[link.source][link.source].z += 1;
+    matrix[link.target][link.target].z += 1;
     nodes[link.source].count += link.value;
     nodes[link.target].count += link.value;
   });
@@ -127,7 +127,12 @@ d3.json("teams.json", function(teams) {
         .attr("x", function(d) { return x(d.x); })
         .attr("width", x.rangeBand())
         .attr("height", x.rangeBand())
-        .style("fill-opacity", function(d) { return z(d.z); })
+        .style("fill-opacity", function(d) {
+          console.log(d.x);
+          console.log(d.y);
+          console.log(d.z);
+          return z(d.z);
+        })
         .style("fill", function(d) { return nodes[d.x].group == nodes[d.y].group ? c(nodes[d.x].group) : null; })
         .on("mouseover", mouseover)
         .on("mouseout", mouseout);

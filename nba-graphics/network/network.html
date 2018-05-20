@@ -1,9 +1,8 @@
 
 <!DOCTYPE html>
-<html class="cns">
+<html class="ocks-org do-not-copy">
 <meta charset="utf-8">
 <style>
-
 
 #circle circle {
   fill: none;
@@ -25,14 +24,10 @@ path.chord {
 
 </style>
 
-<!-- Load our css -->
-<link href="css/css.css" rel="stylesheet">
+<span></span>
 
-<!-- Load d3.js and c3.js -->
-<script src="js/d3.min.js" charset="utf-8"></script>
-
-<script src="http://d3js.org/queue.v1.min.js"></script>
-
+<script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="//d3js.org/queue.v1.min.js"></script>
 <script>
 
 var width = 720,
@@ -65,7 +60,8 @@ svg.append("circle")
     .attr("r", outerRadius);
 
 queue()
-    .defer(d3.json, "teams.json")
+    .defer(d3.json, "teAMS_num.json")
+    .defer(d3.json, "matrix.json")
     .await(ready);
 
 function ready(error, cities, matrix) {
@@ -83,7 +79,7 @@ function ready(error, cities, matrix) {
 
   // Add a mouseover title.
   group.append("title").text(function(d, i) {
-    return cities[i].name + ": " + formatPercent(d.value) + " of origins";
+    return cities[i].name + ": " + formatPercent(d.value/10000) + " of origins";
   });
 
   // Add the group arc.
@@ -132,3 +128,7 @@ function ready(error, cities, matrix) {
 }
 
 </script>
+
+
+
+

@@ -6,7 +6,7 @@ html {
   min-width: 1040px;
 }
 
-.ocks-org body {
+.cns body {
   background: #fcfcfa;
   color: #333;
   font-family: "PT Serif", serif;
@@ -15,25 +15,25 @@ html {
   width: 960px;
 }
 
-.ocks-org header,
-.ocks-org footer,
-.ocks-org aside,
-.ocks-org h1,
-.ocks-org h2,
-.ocks-org h3,
-.ocks-org h4 {
+.cns header,
+.cns footer,
+.cns aside,
+.cns h1,
+.cns h2,
+.cns h3,
+.cns h4 {
   font-family: "PT Sans", sans-serif;
 }
 
-.ocks-org h1,
-.ocks-org h2,
-.ocks-org h3,
-.ocks-org h4 {
+.cns h1,
+.cns h2,
+.cns h3,
+.cns h4 {
   color: #000;
 }
 
-.ocks-org header,
-.ocks-org footer {
+.cns header,
+.cns footer {
   color: #636363;
 }
 
@@ -65,14 +65,14 @@ footer {
   font-size: small;
 }
 
-.ocks-org header aside,
-.ocks-org footer aside {
+.cns header aside,
+.cns footer aside {
   float: left;
   margin-right: .5em;
 }
 
-.ocks-org header aside:after,
-.ocks-org footer aside:after {
+.cns header aside:after,
+.cns footer aside:after {
   padding-left: .5em;
   content: "/";
 }
