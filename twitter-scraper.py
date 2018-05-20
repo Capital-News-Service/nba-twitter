@@ -25,7 +25,7 @@ chrome_options = Options()
 chrome_options.add_argument("--headless")
 
 #Fill in path to chromedrive.exe here
-chromedriver = '/usr/bin/chromedriver/chromedriver'
+chromedriver = 'C:\\Users\\jagluck\\Documents\\Github\\nba-twitter\\chromedriver_win.exe'
 driver = webdriver.Chrome(chromedriver)
 
 #This is ther list of accounts you would like to gather, put in their twitter usernames
@@ -37,7 +37,7 @@ NBACAPS = ['CAVS','OKCTHUNDER','CELTICS','NYKNICKS','BROOKLYNNETS','PELICANSNBA'
 'HORNETS', 'DETROITPISTONS', 'DALLASMAVS', 'LACLIPPERS', 'LAKERS', 'UTAHJAZZ', 'NUGGETS', 'WASHWIZARDS', 'CHICAGOBULLS',
 'SPURS', 'SUNS', 'HOUSTONROCKETS', 'WARRIORS', 'ATLHAWKS', 'MEMGRIZZ', 'BUCKS', 'RAPTORS', 'SACRAMENTOKINGS', 'SIXERS', 'TRAILBLAZERS'];
 
-nbaSmall=['TRAILBLAZERS','WARRIORS','ATLHAWKS','BUCKS']
+nbaSmall=['WARRIORS','ATLHAWKS']
 
 pages_visited = 0
 empty_relations = 0
