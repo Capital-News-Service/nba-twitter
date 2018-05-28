@@ -7,7 +7,7 @@
 	{"name" :"PELICANS", "color" : "#0C2340"},
 	{"name" :"PACERS", "color" : "#FDBB30"},
 	{"name" :"MAGIC", "color" : "#0077C0"},
-	{"name" :"TIMBERWOLVES", "color" : "#236192"},
+	{"name" :"WOLVES", "color" : "#236192"},
 	{"name" :"HEAT", "color" : "#98002E"},
 	{"name" :"HORNETS", "color" : "#00788C"},
 	{"name" :"PISTONS", "color" : "#ED174C"},
@@ -23,10 +23,10 @@
 	{"name" :"ROCKETS", "color" : "#CE1141"},
 	{"name" :"WARRIORS", "color" : "#006BB6"},
 	{"name" :"HAWKS", "color" : "#E03A3E"},
-	{"name" :"GRIZ", "color" : "#6189B9"},
+	{"name" :"GRIZZLIES", "color" : "#6189B9"},
 	{"name" :"BUCKS", "color" : "#00471B"},
 	{"name" :"RAPTORS", "color" : "#000000"},
 	{"name" :"KINGS", "color" : "#5A2D81"},
 	{"name" :"SIXERS", "color" : "#006BB6"},
-	{"name" :"TRAILBLAZERS", "color" : "#E03A3E"}
+	{"name" :"BLAZERS", "color" : "#E03A3E"}
 ]

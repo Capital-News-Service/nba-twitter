@@ -1,178 +1,213 @@
-
 <!DOCTYPE html>
-<html class="cns">
-<meta charset="utf-8">
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
 
-<!-- Load our css -->
-<link href="css/css.css" rel="stylesheet">
+    <title>
+      Capital News Service
+    </title>
 
-<!-- Load d3.js and c3.js -->
-<script src="js/d3.min.js" charset="utf-8"></script>
+    <link href="https://fonts.googleapis.com/css?family=Droid+Serif:400,400i,700,700i|Poppins:300,400,500,600,700&amp;subset=latin-ext" rel="stylesheet">
+    
+    <!-- Load c3.css -->
+  <link href="css/c3.css" rel="stylesheet">
+
+  <!-- Load our css -->
+  <link href="css/css.css" rel="stylesheet">
+
+  <!-- Load d3.js and c3.js -->
+  <script src="js/d3.min.js" charset="utf-8"></script>
+  <script src="js/c3.min.js"></script>
+
+       <style>
+
+      .background {
+        fill: #eee;
+      }
+
+      line {
+        stroke: #fff;
+      }
+
+      text.active {
+        fill: red;
+      }
 
 
-<style>
+      </style>
 
-.background {
-  fill: #eee;
-}
+  </head>
 
-line {
-  stroke: #fff;
-}
+  <body>
+    <div id="container">
+      <h1 class="highcharts-title">Conversations are concentrated between a few teams</h1>
 
-text.active {
-  fill: red;
-}
+      <text class="highcharts-subtitle" y="60">
+        <tspan>BY JAKE GLUCK</tspan>
+        <!-- ^^ PUT YOUR NAME HERE, TAKE CREDIT FOR YOUR COOL WORK ^^ -->
+        <tspan onclick="location.href=&quot;http://cnsmaryland.org&quot;"> | CAPITAL NEWS SERVICE</tspan>
+        <br>
+      <div id="line"></div>
+        <span style="height:8px; font-size:4pt; background-color:#fbd603 ; color:#fbd603 ;"></span>
+      </text>
+       <h5>
+             Capital News Service gathered a dataset of every conversation that has ever occured between NBA teams. A conversation is any chain of replies that includes at least two official NBA team accounts. The conversations are mostly concetrated between a select group of more friendly teams. When a less friendly team has a conversation it is often because it has been sparked by one of the more more active teams. The matrix shows how many times each NBA team has participated in a conversation involving every other team. The darker the square the more conversations have occured, hover over each square to see the exact number of conversations.
+      </h5>
+      <div id="chart"></div>
+      <div id="source"><text><a href="http://cnsmaryland.org/home"><tspan>Source: Capital News Service</tspan></a></text></div>
+      <!-- ^^ PUT YOUR SOURCE HERE AND LINK IT^^ -->
+    </div>
+    <script type="text/javascript">
+           var margin = {top: 0, right: 0, bottom: 0, left: 0},
+           width = 900,
+           height = 900;
 
-</style>
+      var x = d3.scale.ordinal().rangeBands([0, width - 150]),
+          z = d3.scale.linear().domain([0, 4]).clamp(true),
+          c = d3.scale.category10().domain(d3.range(10));
 
-<p>Order: <select id="order">
-  <option value="name">by Name</option>
-  <option value="count">by Frequency</option>
-  <option value="group">by Conference</option>
-</select>
+      var svg = d3.select("#chart").append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+          .style("margin-left", -margin.left + "px")
+        .append("g")
+          .attr("transform", "translate(" + 150 + "," + 150 + ")");
 
-<script>
+      d3.json("teams_num.json", function(teams) {
+        var matrix = [],
+            nodes = teams.nodes,
+            n = nodes.length;
 
-var margin = {top: 80, right: 0, bottom: 10, left: 80},
-    width = 720,
-    height = 720;
+        // Compute index per node.
+        nodes.forEach(function(node, i) {
+          node.index = i;
+          node.count = 0;
+          matrix[i] = d3.range(n).map(function(j) { return {x: j, y: i, z: 0}; });
+        });
 
-var x = d3.scale.ordinal().rangeBands([0, width]),
-    z = d3.scale.linear().domain([0, 4]).clamp(true),
-    c = d3.scale.category10().domain(d3.range(10));
+        // Convert links to matrix; count character occurrences.
+        teams.links.forEach(function(link) {
+          v = ((link.value)/50) + .05
+          if (link.value === 0){
+            v = .01;
+          }
+          if(v >= 1){
+            //console.log("maxed");
+          }
+          matrix[link.source][link.target].z += v;
+          matrix[link.target][link.source].z += v;
+          matrix[link.source][link.source].z = 0;
+          matrix[link.target][link.target].z = 0;
+          nodes[link.source].count += link.value;
+          nodes[link.target].count += link.value;
+        });
 
-var svg = d3.select("body").append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .style("margin-left", -margin.left + "px")
-  .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        // Precompute the orders.
+        var count = d3.range(n).sort(function(a, b) { return nodes[b].count - nodes[a].count; })
 
-d3.json("teams_num.json", function(teams) {
-  var matrix = [],
-      nodes = teams.nodes,
-      n = nodes.length;
+        // The default sort order.
+        x.domain(count);
 
-  // Compute index per node.
-  nodes.forEach(function(node, i) {
-    node.index = i;
-    node.count = 0;
-    matrix[i] = d3.range(n).map(function(j) { return {x: j, y: i, z: 0}; });
-  });
+        svg.append("rect")
+            .attr("class", "background")
+            .attr("width", width)
+            .attr("height", height);
 
-  // Convert links to matrix; count character occurrences.
-  teams.links.forEach(function(link) {
-    matrix[link.source][link.target].z += ((link.value - 5.710344827586207)/7.523374067023274) + .5;
-    matrix[link.target][link.source].z += ((link.value - 5.710344827586207)/7.523374067023274) + .5;
-    matrix[link.source][link.source].z += 1;
-    matrix[link.target][link.target].z += 1;
-    nodes[link.source].count += link.value;
-    nodes[link.target].count += link.value;
-  });
+        var row = svg.selectAll(".row")
+            .data(matrix)
+          .enter().append("g")
+            .attr("class", "row")
+            .attr("transform", function(d, i) { return "translate(0," + x(i) + ")"; })
+            .each(row);
 
-  // Precompute the orders.
-  var orders = {
-    name: d3.range(n).sort(function(a, b) { return d3.ascending(nodes[a].name, nodes[b].name); }),
-    count: d3.range(n).sort(function(a, b) { return nodes[b].count - nodes[a].count; }),
-    group: d3.range(n).sort(function(a, b) { return nodes[b].group - nodes[a].group; })
-  };
+        row.append("line")
+            .attr("x2", width);
 
-  // The default sort order.
-  x.domain(orders.name);
+        row.append("text")
+            .attr("x", -35)
+            .attr("y", x.rangeBand() / 2)
+            .attr("dy", ".32em")
+            .attr("text-anchor", "end")
+            .text(function(d, i) { return nodes[i].name; });
 
-  svg.append("rect")
-      .attr("class", "background")
-      .attr("width", width)
-      .attr("height", height);
+        row.append("svg:image")
+            .attr('x', -25)
+            .attr('y', 2)
+            .attr('width', 20)
+            .attr('height', 24)
+            .attr("xlink:href", function(d, i) { return "logos/nba_" + nodes[i].name + ".png";});
 
-  var row = svg.selectAll(".row")
-      .data(matrix)
-    .enter().append("g")
-      .attr("class", "row")
-      .attr("transform", function(d, i) { return "translate(0," + x(i) + ")"; })
-      .each(row);
+        var column = svg.selectAll(".column")
+            .data(matrix)
+          .enter().append("g")
+            .attr("class", "column")
+            .attr("transform", function(d, i) { return "translate(" + x(i) + ")rotate(-90)"; });
 
-  row.append("line")
-      .attr("x2", width);
+        column.append("line")
+            .attr("x1", -width);
 
-  row.append("text")
-      .attr("x", -6)
-      .attr("y", x.rangeBand() / 2)
-      .attr("dy", ".32em")
-      .attr("text-anchor", "end")
-      .text(function(d, i) { return nodes[i].name; });
+        column.append("text")
+            .attr("x", 35)
+            .attr("y", x.rangeBand() / 2)
+            .attr("dy", ".32em")
+            .attr("text-anchor", "start")
+            .text(function(d, i) { return nodes[i].name; });
 
-  var column = svg.selectAll(".column")
-      .data(matrix)
-    .enter().append("g")
-      .attr("class", "column")
-      .attr("transform", function(d, i) { return "translate(" + x(i) + ")rotate(-90)"; });
+        column.append("svg:image")
+            .attr('x', 5)
+            .attr('y', -28)
+            .attr('width', 20)
+            .attr('height', 24)
+            .attr("xlink:href", function(d, i) { return "logos/nba_" + nodes[i].name + ".png";})
+            .attr("transform", "rotate(90)");
 
-  column.append("line")
-      .attr("x1", -width);
+        function row(row) {
+          var cell = d3.select(this).selectAll(".cell")
+              .data(row.filter(function(d) { return d.z; }))
+            .enter().append("rect")
+              .attr("class", "cell")
+              .attr("x", function(d) { return x(d.x); })
+              .attr("width", x.rangeBand())
+              .attr("height", x.rangeBand())
+              .style("fill-opacity", function(d) {
+                //console.log(d.z);
+                return d.z;
+              })
+              .style("fill", function(d) { return nodes[d.x].group == nodes[d.y].group ? c(nodes[d.x].group) : null; })
+              .on("mouseover", mouseover)
+              .on("mouseout", mouseout);
+        }
 
-  column.append("text")
-      .attr("x", 6)
-      .attr("y", x.rangeBand() / 2)
-      .attr("dy", ".32em")
-      .attr("text-anchor", "start")
-      .text(function(d, i) { return nodes[i].name; });
+        function mouseover(p) {
+          d3.selectAll(".row text").classed("active", function(d, i) { return i == p.y; });
+          d3.selectAll(".column text").classed("active", function(d, i) { return i == p.x; });
+          return "<strong>Frequency:</strong> <span style='color:red'>" + p.z + "</span>";
+        }
 
-  function row(row) {
-    var cell = d3.select(this).selectAll(".cell")
-        .data(row.filter(function(d) { return d.z; }))
-      .enter().append("rect")
-        .attr("class", "cell")
-        .attr("x", function(d) { return x(d.x); })
-        .attr("width", x.rangeBand())
-        .attr("height", x.rangeBand())
-        .style("fill-opacity", function(d) {
-          console.log(d.x);
-          console.log(d.y);
-          console.log(d.z);
-          return z(d.z);
-        })
-        .style("fill", function(d) { return nodes[d.x].group == nodes[d.y].group ? c(nodes[d.x].group) : null; })
-        .on("mouseover", mouseover)
-        .on("mouseout", mouseout);
-  }
+        function mouseout() {
+          d3.selectAll("text").classed("active", false);
+        }
 
-  function mouseover(p) {
-    d3.selectAll(".row text").classed("active", function(d, i) { return i == p.y; });
-    d3.selectAll(".column text").classed("active", function(d, i) { return i == p.x; });
-  }
+        d3.select("#order").on("change", function() {
+          clearTimeout(timeout);
+          order(this.value);
+        });
 
-  function mouseout() {
-    d3.selectAll("text").classed("active", false);
-  }
+        svg.selectAll(".cell").append("title").text(function(d) {
+          o = 0;
+          if (matrix[d.x][d.y].z !== .01){
+            o = Math.round((matrix[d.x][d.y].z - .05) * 50)
+          }
+        
+          return o
+              + " Conversations"
+        });
 
-  d3.select("#order").on("change", function() {
-    clearTimeout(timeout);
-    order(this.value);
-  });
+      });
 
-  function order(value) {
-    x.domain(orders[value]);
+   </script>
+  </body>
+ 
+ <!-- Based on graphic by Mike Bostock -  https://bost.ocks.org/mike/miserables/ -->
 
-    var t = svg.transition().duration(2500);
-
-    t.selectAll(".row")
-        .delay(function(d, i) { return x(i) * 4; })
-        .attr("transform", function(d, i) { return "translate(0," + x(i) + ")"; })
-      .selectAll(".cell")
-        .delay(function(d) { return x(d.x) * 4; })
-        .attr("x", function(d) { return x(d.x); });
-
-    t.selectAll(".column")
-        .delay(function(d, i) { return x(i) * 4; })
-        .attr("transform", function(d, i) { return "translate(" + x(i) + ")rotate(-90)"; });
-  }
-
-  var timeout = setTimeout(function() {
-    order("group");
-    d3.select("#order").property("selectedIndex", 2).node().focus();
-  }, 5000);
-});
-
-</script>
+</html>

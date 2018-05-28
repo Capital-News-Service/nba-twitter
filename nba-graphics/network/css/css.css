@@ -1,206 +1,68 @@
-/* Copyright 2013 Michael Bostock. All rights reserved. Do not copy. */
+@charset "UTF-8";
 
-@import url(//fonts.googleapis.com/css?family=PT+Serif|PT+Serif:b|PT+Serif:i|PT+Sans|PT+Sans:b);
-
-html {
-  min-width: 1040px;
+div#source {
+	font-family:'Poppins';
+	text-align: right;
+	padding-top: 10px;
+	font-size: 16px;
+	color: gray;
 }
 
-.cns body {
-  background: #fcfcfa;
-  color: #333;
-  font-family: "PT Serif", serif;
-  margin: 1em auto 4em auto;
-  position: relative;
-  width: 960px;
+a{
+	color: inherit;
+  	text-decoration: inherit;
 }
 
-.cns header,
-.cns footer,
-.cns aside,
-.cns h1,
-.cns h2,
-.cns h3,
-.cns h4 {
-  font-family: "PT Sans", sans-serif;
+#chart{
+	margin-top:10px;
 }
 
-.cns h1,
-.cns h2,
-.cns h3,
-.cns h4 {
-  color: #000;
+.highcharts-title {
+	font-family: 'Droid Serif', serif;
+	font-weight:600;
+	font-size:36pt;
+	fill:#2c2c2c;
+	margin-top: 0px;
+	margin-bottom: 0px;
+	
+}
+.highcharts-subtitle {
+	font-family: 'Poppins', sans-serif;
+    color: grey;
+    font-weight: 300;
+    font-size: 12pt;
 }
 
-.cns header,
-.cns footer {
-  color: #636363;
+/*Styles the div that holds the highchart */
+div#container {
+	margin-top:20px;
+	margin-bottom:20px;
+	padding-left:20px;
+	padding-top:20px;
+	padding-right:30px;
+	padding-bottom:10px;
+	border-left:1px solid black;
+	border-bottom:14pt solid black;
+	border-top:1px solid black;
+	border-right:1px solid black;
+	box-shadow:5px 5px 10px gainsboro;
+	min-width: 310px;
+	max-width: 900px; 
+
+	margin-left:auto;
+	margin-right:auto;
 }
 
-h1 {
-  font-size: 64px;
-  font-weight: 300;
-  letter-spacing: -2px;
-  margin: .3em 0 .1em 0;
+#line {
+  background: #fbd603;
+  width: 100%;
+  height: 7px;
+  margin-top: 6px;
 }
-
-h2 {
-  margin-top: 2em;
-}
-
-h1, h2 {
-  text-rendering: optimizeLegibility;
-}
-
-h2 a[name],
-h2 a[id] {
-  color: #ccc;
-  right: 100%;
-  padding: 0 .3em;
-  position: absolute;
-}
-
-header,
-footer {
-  font-size: small;
-}
-
-.cns header aside,
-.cns footer aside {
-  float: left;
-  margin-right: .5em;
-}
-
-.cns header aside:after,
-.cns footer aside:after {
-  padding-left: .5em;
-  content: "/";
-}
-
-footer {
-  margin-top: 8em;
-}
-
-h1 ~ aside {
-  font-size: small;
-  right: 0;
-  position: absolute;
-  width: 180px;
-}
-
-.attribution {
-  font-size: small;
-  margin-bottom: 2em;
-}
-
-body > p, li > p {
-  line-height: 1.5em;
-}
-
-body > p {
-  width: 720px;
-}
-
-body > blockquote {
-  width: 640px;
-}
-
-blockquote q {
-  display: block;
-  font-style: oblique;
-}
-
-ul {
-  padding: 0;
-}
-
-li {
-  width: 690px;
-  margin-left: 30px;
-}
-
-a {
-  color: steelblue;
-}
-
-a:not(:hover) {
-  text-decoration: none;
-}
-
-pre, code, textarea {
-  font-family: "Menlo", monospace;
-}
-
-code {
-  line-height: 1em;
-}
-
-textarea {
-  font-size: 100%;
-}
-
-body > pre {
-  border-left: solid 2px #ccc;
-  padding-left: 18px;
-  margin: 2em 0 2em -20px;
-}
-
-.html .value,
-.javascript .string,
-.javascript .regexp {
-  color: #756bb1;
-}
-
-.html .tag,
-.css .tag,
-.javascript .keyword {
-  color: #3182bd;
-}
-
-.comment {
-  color: #636363;
-}
-
-.html .doctype,
-.javascript .number {
-  color: #31a354;
-}
-
-.html .attribute,
-.css .attribute,
-.javascript .class,
-.javascript .special {
-  color: #e6550d;
-}
-
-svg {
-  font: 10px sans-serif;
-}
-
-.axis path, .axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
-
-sup, sub {
-  line-height: 0;
-}
-
-q:before {
-  content: "“";
-}
-
-q:after {
-  content: "”";
-}
-
-blockquote q {
-  line-height: 1.5em;
-  display: inline;
-}
-
-blockquote q:before,
-blockquote q:after {
-  content: "";
-}
+  h5 {
+      font-family:'Droid Serif', serif;
+      font-weight:400;
+      font-size:16pt;
+      color:#2c2c2c;
+      text-align:left;
+    }

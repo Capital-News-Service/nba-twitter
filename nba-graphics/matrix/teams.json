@@ -7,7 +7,7 @@
 	{"name" :"PELICANS", "group" : 1},
 	{"name" :"PACERS", "group" : 0},
 	{"name" :"MAGIC", "group" : 0},
-	{"name" :"TIMBERWOLVES", "group" : 1},
+	{"name" :"WOLVES", "group" : 1},
 	{"name" :"HEAT", "group" : 0},
 	{"name" :"HORNETS", "group" : 0},
 	{"name" :"PISTONS", "group" : 0},
@@ -28,7 +28,7 @@
 	{"name" :"RAPTORS", "group" : 0},
 	{"name" :"KINGS", "group" : 1},
 	{"name" :"SIXERS", "group" : 0},
-	{"name" :"TRAILBLAZERS", "group" : 1}
+	{"name" :"BLAZERS", "group" : 1}
 ],
 "links":
 	[

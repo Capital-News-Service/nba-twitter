@@ -1,8 +1,28 @@
-
 <!DOCTYPE html>
-<html class="ocks-org do-not-copy">
-<meta charset="utf-8">
-<style>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+
+    <title>
+      Capital News Service
+    </title>
+
+    <link href="https://fonts.googleapis.com/css?family=Droid+Serif:400,400i,700,700i|Poppins:300,400,500,600,700&amp;subset=latin-ext" rel="stylesheet">
+    
+    <!-- Load c3.css -->
+  <link href="css/c3.css" rel="stylesheet">
+
+  <!-- Load our css -->
+  <link href="css/css.css" rel="stylesheet">
+
+  <!-- Load d3.js and c3.js -->
+  <script src="js/d3.min.js" charset="utf-8"></script>
+  <script src="js/c3.min.js"></script>
+
+  <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script src="//d3js.org/queue.v1.min.js"></script>
+
+       <style>
 
 #circle circle {
   fill: none;
@@ -24,15 +44,34 @@ path.chord {
 
 </style>
 
-<span></span>
+  </head>
 
-<script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
-<script src="//d3js.org/queue.v1.min.js"></script>
-<script>
+  <body>
+    <div id="container">
+      <h1 class="highcharts-title">NBA teams develop relationships on Twitter</h1>
 
-var width = 720,
-    height = 720,
-    outerRadius = Math.min(width, height) / 2 - 10,
+      <text class="highcharts-subtitle" y="60">
+        <tspan>BY JAKE GLUCK</tspan>
+        <!-- ^^ PUT YOUR NAME HERE, TAKE CREDIT FOR YOUR COOL WORK ^^ -->
+        <tspan onclick="location.href=&quot;http://cnsmaryland.org&quot;"> | CAPITAL NEWS SERVICE</tspan>
+        <br>
+      <div id="line"></div>
+        <!--<span style="height:8px; font-size:4pt; background-color:#fbd603 ; color:#fbd603 ;">____________________________________________________________________________________________________________________________</span>-->
+      </text>
+      <h5>
+        Our dataset reveals NBA teams prefer to communicate with a few particular teams they have created friendships with. Many teams have never had a single conversation with each other. Hover over a team to see their specific relationships.
+
+      </h5>
+      <div id="chart"></div>
+      <div id="source"><text><a href="http://cnsmaryland.org/home"><tspan>Source: Capital News Service</tspan></a></text></div>
+      <!-- ^^ PUT YOUR SOURCE HERE AND LINK IT^^ -->
+
+    </div>
+
+    <script type="text/javascript">
+           var width = 1000,
+            height = 750,
+    outerRadius = Math.min(width, height) / 2 - 25,
     innerRadius = outerRadius - 24;
 
 var formatPercent = d3.format(".1%");
@@ -49,7 +88,7 @@ var layout = d3.layout.chord()
 var path = d3.svg.chord()
     .radius(innerRadius);
 
-var svg = d3.select("body").append("svg")
+var svg = d3.select("#chart").append("svg")
     .attr("width", width)
     .attr("height", height)
   .append("g")
@@ -60,7 +99,7 @@ svg.append("circle")
     .attr("r", outerRadius);
 
 queue()
-    .defer(d3.json, "teAMS_num.json")
+    .defer(d3.json, "teams_num.json")
     .defer(d3.json, "matrix.json")
     .await(ready);
 
@@ -79,7 +118,7 @@ function ready(error, cities, matrix) {
 
   // Add a mouseover title.
   group.append("title").text(function(d, i) {
-    return cities[i].name + ": " + formatPercent(d.value/10000) + " of origins";
+    return cities[i].name + ": " + formatPercent(d.value/10000) + " of conversations";
   });
 
   // Add the group arc.
@@ -89,16 +128,20 @@ function ready(error, cities, matrix) {
       .style("fill", function(d, i) { return cities[i].color; });
 
   // Add a text label.
-  var groupText = group.append("text")
+  var groupText = group
+  .append("text")
       .attr("x", 6)
-      .attr("dy", 15);
+      .attr("dy", -10);
+    
+   
 
-  groupText.append("textPath")
+  var textPath = groupText.append("textPath")
       .attr("xlink:href", function(d, i) { return "#group" + i; })
-      .text(function(d, i) { return cities[i].name; });
+      .text(function(d, i) { return cities[i].name; })
+      .style("font-size", "16px");
 
   // Remove the labels that don't fit. :(
-  groupText.filter(function(d, i) { return groupPath[0][i].getTotalLength() / 2 - 16 < this.getComputedTextLength(); })
+  groupText.filter(function(d, i) { return groupPath[0][i].getTotalLength() / 2 - 24 < this.getComputedTextLength(); })
       .remove();
 
   // Add the chords.
@@ -112,11 +155,9 @@ function ready(error, cities, matrix) {
   // Add an elaborate mouseover title for each chord.
   chord.append("title").text(function(d) {
     return cities[d.source.index].name
-        + " → " + cities[d.target.index].name
-        + ": " + formatPercent(d.source.value)
-        + "\n" + cities[d.target.index].name
-        + " → " + cities[d.source.index].name
-        + ": " + formatPercent(d.target.value);
+        + " - " + cities[d.target.index].name
+        + ": " + d.source.value
+        + " conversations"
   });
 
   function mouseover(d, i) {
@@ -124,10 +165,16 @@ function ready(error, cities, matrix) {
       return p.source.index != i
           && p.target.index != i;
     });
+
+
   }
 }
+   </script>
+  </body>
 
-</script>
+<!-- Based on graphic by Mike Bostock - https://bost.ocks.org/mike/uberdata/ -->
+ 
+</html>
 
 
 
