@@ -1,5 +1,10 @@
 # Jake Gluck - Capital News Service
 
+# jagluck.github.io
+
+# This is an automated web scraper that gathers all conversations between any number of twitter accounts
+# To use fill download selenium and fill in its location, then fill in your accounts
+
 import sys
 
 #pip.main(['install','selenium'])
@@ -26,30 +31,37 @@ chrome_options.add_argument("--headless")
 
 #Fill in path to chromedrive.exe here
 chromedriver = 'C:\\Users\\jagluck\\Documents\\Github\\nba-twitter\\chromedriver_win.exe'
-driver = webdriver.Chrome(chromedriver)
+
+#to view browser working remove chrome_options
+driver = webdriver.Chrome(chromedriver, chrome_options=chrome_options)
 
 #This is ther list of accounts you would like to gather, put in their twitter usernames
-nba = ['cavs','okcthunder','celtics','NYKnicks','BrooklynNets','PelicansNBA', 'Pacers', 'OrlandoMagic','Timberwolves','MiamiHEAT',
+accounts = ['cavs','okcthunder','celtics','NYKnicks','BrooklynNets','PelicansNBA', 'Pacers', 'OrlandoMagic','Timberwolves','MiamiHEAT',
 'Hornets', 'DetroitPistons', 'DallasMavs', 'LAClippers', 'Lakers', 'UtahJazz', 'nuggets', 'WashWizards', 'chicagobulls',
 'spurs', 'Suns', 'HoustonRockets', 'warriors', 'ATLHawks', 'MemGrizz', 'Bucks', 'Raptors', 'SacramentoKings', 'Sixers', 'trailblazers'];
 
+#accounts to search for conversations between, 
 NBACAPS = ['CAVS','OKCTHUNDER','CELTICS','NYKNICKS','BROOKLYNNETS','PELICANSNBA', 'PACERS', 'ORLANDOMAGIC','TIMBERWOLVES','MIAMIHEAT',
 'HORNETS', 'DETROITPISTONS', 'DALLASMAVS', 'LACLIPPERS', 'LAKERS', 'UTAHJAZZ', 'NUGGETS', 'WASHWIZARDS', 'CHICAGOBULLS',
 'SPURS', 'SUNS', 'HOUSTONROCKETS', 'WARRIORS', 'ATLHAWKS', 'MEMGRIZZ', 'BUCKS', 'RAPTORS', 'SACRAMENTOKINGS', 'SIXERS', 'TRAILBLAZERS'];
 
-nbaSmall=['WARRIORS','ATLHAWKS']
+#for testing
+accountsSmall=['WARRIORS','ATLHAWKS']
 
 pages_visited = 0
 empty_relations = 0
 
+#count number of pages visited
 def countPage():
     global pages_visited
     pages_visited = pages_visited + 1
 
+#count relatioships with 0 conversations
 def countEmptyRelation():
     global empty_relations
     empty_relations = empty_relations + 1
 
+#scroll mentions page down
 def scroll_down():
      #scroll to bottom of page
     lastHeight = driver.execute_script("return document.body.scrollHeight")
@@ -66,6 +78,7 @@ def scroll_down():
 
         time.sleep(.5)
 
+#scroll overlay/specific chain of replies down to read all replies
 def scroll_down_overlay():  
 
     notRead = False
@@ -96,6 +109,7 @@ def scroll_down_overlay():
             print("No dialog overlay")
             notRead = True
 
+#scroll overlay/specific chain of replies up to read previous tweets in conv
 def scroll_up_overlay():
 
     notRead = True
@@ -130,6 +144,7 @@ def scroll_up_overlay():
             print("No dialog overlay")
             notRead = False
 
+#load mentions page
 def load_page(url):
     countPage()
     driver.get(url) 
@@ -137,6 +152,7 @@ def load_page(url):
 
     scroll_down()
 
+#load specific tweet page
 def load_page_tweet(url):
     countPage()
     driver.get(url) 
@@ -345,6 +361,7 @@ def getTweets(sender, to):
      
     return row
 
+#loop through every combination of accounts
 def findData(teams):
     table = []
     c = 0
@@ -361,12 +378,13 @@ def findData(teams):
 
     return table
 
-result = findData(nbaSmall)
+#crawl all relationships
+result = findData(accounts)
 print("Finished\nPages Visited: " + str(pages_visited) + "\nEmpty Relations: " + str(empty_relations))
 df = pd.DataFrame(result, columns=['head', 'from', 'to', 'tweets', 'size', 'dates', 'names', 'usernames'])
 df = df.sort_values('size', ascending=False).drop_duplicates('head')
 print(df)
-df.to_csv("nba-conv-x.csv", sep=',')
+df.to_csv("conversations.csv", sep=',')
 driver.close()
 
 
