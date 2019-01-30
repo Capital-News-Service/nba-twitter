@@ -1,4 +1,8 @@
 # nba-twitter
+
+Made by Jake Gluck [jagluck.github.io](jagluck.github.io).   
+jakeagluck@gmail.com jagluck@terpmail.umd.edu
+
 Analyzing the ways NBA teams communicate on Twitter
 
 View the stories here:
